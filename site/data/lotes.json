@@ -1,0 +1,11 @@
+{
+ "_comentario": "Lotes financiados por compra. O agente escreve aqui: le a compra na chain (publico, sem carteira) e registra o lote que disparou em nome daquele endereco. Vazio ate o token existir.",
+ "modo": "replay",
+ "mostrar_endereco": "truncado",
+ "resumo": {
+  "financiadores": 0,
+  "moleculas_financiadas": 0,
+  "minutos_gpu": 0
+ },
+ "lotes": []
+}

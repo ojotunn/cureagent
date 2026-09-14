@@ -191,6 +191,22 @@
   code{font-family:var(--mono);background:var(--paper);border:1px solid var(--line);
     padding:2px 6px;border-radius:5px;font-size:12.5px}
 
+  /* ---------- quem pagou ---------- */
+  .lote-resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:12px;margin-bottom:16px}
+  .lote-resumo div{background:var(--card);border:1px solid var(--line);
+    border-radius:11px;padding:15px 17px}
+  .lote-resumo b{display:block;font-family:var(--mono);font-size:24px;font-weight:620;
+    letter-spacing:-.02em}
+  .lote-resumo span{display:block;font-size:10.5px;color:var(--dim);margin-top:4px;
+    text-transform:uppercase;letter-spacing:.09em}
+  .vazio{background:var(--card);border:1px dashed var(--line);border-radius:12px;
+    padding:30px 24px;text-align:center;color:var(--dim);font-size:14px}
+  .vazio b{display:block;color:var(--ink);font-size:15px;font-weight:600;margin-bottom:7px}
+  td.addr{font-family:var(--mono)}
+  td.addr a{color:var(--accent);text-decoration:none}
+  td.addr a:hover{text-decoration:underline}
+
   /* ---------- feed de resultados ---------- */
   .post{background:var(--card);border:1px solid var(--line);border-radius:12px;
     padding:20px 22px;margin-bottom:12px}
@@ -313,6 +329,15 @@
         <div id="porqueAlvoTxt"></div>
       </div>
     </div>
+  </section>
+
+  <section id="secLotes">
+    <h2>Who paid for this</h2>
+    <p class="note">Every purchase funds a batch of molecules, screened in the
+       name of the address that paid for it. The batch is public the moment it
+       runs — here, on the live view above, and in the downloadable data.</p>
+    <div class="lote-resumo" id="loteResumo" style="margin-top:16px"></div>
+    <div id="loteCorpo"></div>
   </section>
 
   <section>
@@ -753,6 +778,45 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
       <span>${esc(x.descricao)}</span>
       <em>${x.linhas ? fmt(x.linhas) + " rows · " : ""}download</em>
     </a>`).join("");
+
+  /* ---- quem pagou: lotes financiados por compra ---- */
+  fetch("data/lotes.json").then(r => r.json()).then(lt => {
+    const lotes = lt.lotes || [], res = lt.resumo || {};
+    const trunc = e => (lt.mostrar_endereco === "completo" || !e || e.length < 14)
+      ? e : `${e.slice(0, 6)}…${e.slice(-4)}`;
+
+    document.getElementById("loteResumo").innerHTML = [
+      [fmt(res.financiadores || 0), "people who paid"],
+      [fmt(res.moleculas_financiadas || 0), "molecules they funded"],
+      [(res.minutos_gpu || 0) + " min", "GPU time they bought"],
+    ].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join("");
+
+    if (!lotes.length) {
+      document.getElementById("loteCorpo").innerHTML = `
+        <div class="vazio">
+          <b>No purchases yet</b>
+          Nothing is for sale at the moment. When it is, every batch appears here
+          within seconds of the transaction — address, molecules screened, best
+          score found, and the minutes of GPU it paid for.
+        </div>`;
+      return;
+    }
+
+    document.getElementById("loteCorpo").innerHTML =
+      `<div class="tablewrap scroll"><table>
+        <thead><tr><th>when</th><th>address</th><th>molecules</th>
+          <th>best score</th><th>GPU</th><th></th></tr></thead><tbody>` +
+      lotes.map(l => `<tr>
+        <td>${esc(l.ts || "")}</td>
+        <td class="addr">${l.tx
+          ? `<a href="https://robinhoodchain.blockscout.com/tx/${esc(l.tx)}" target="_blank" rel="noopener">${esc(trunc(l.endereco))}</a>`
+          : esc(trunc(l.endereco))}</td>
+        <td>${fmt(l.moleculas || 0)}</td>
+        <td>${l.melhor != null ? l.melhor.toFixed(2) : "—"}</td>
+        <td>${l.gpu_min != null ? l.gpu_min + " min" : "—"}</td>
+        <td>${l.estado === "running" ? "<span class=\"warnc\">running</span>" : ""}</td>
+      </tr>`).join("") + `</tbody></table></div>`;
+  }).catch(() => {});
 
   /* ---- contrato, so quando existir de verdade ---- */
   fetch("token.json").then(r => r.json()).then(tk => {
