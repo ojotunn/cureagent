@@ -60,6 +60,11 @@
   body.v7 .six{position:absolute;bottom:26px;left:0;right:0;text-align:center;
     font-family:var(--mono);font-size:13px;color:#767d84;letter-spacing:.16em}
 
+  /* v8/v9 — proteina escura sobre chroma, para virar PNG transparente */
+  body.v8 .card, body.v9 .card{padding:0}
+  body.v8 .num, body.v8 .sub, body.v9 .num, body.v9 .sub{display:none}
+  body.v8 #mol, body.v9 #mol{width:400px;height:400px}
+
   /* v3 — inicial, para quem prefere letra a numero */
   body.v3 .card{background:var(--accent);color:#fff}
   body.v3 .num{font-size:236px;font-weight:660;letter-spacing:-.06em;line-height:1}
@@ -80,19 +85,25 @@
   if (v === "3") document.getElementById("n").textContent = "E";
   if (v === "7") document.getElementById("six").hidden = false;
 
-  if (v === "4" || v === "5" || v === "6" || v === "7") {
+  if (["4","5","6","7","8","9"].includes(v)) {
     const el = document.getElementById("mol");
     el.hidden = false;
-    const fundo = (v === "4") ? "#ffffff" : (v === "7") ? "#fbfbfa" : "#0e7c6b";
+    const fundo = (v === "4") ? "#ffffff" : (v === "7") ? "#fbfbfa"
+      : (v === "8" || v === "9")
+        ? (new URLSearchParams(location.search).get("bg") === "preto"
+           ? "#000000" : "#ffffff")
+      : "#0e7c6b";
     const claro = (v === "6");
     const view = $3Dmol.createViewer(el, {backgroundColor: fundo});
     const arq = (v === "5") ? "../data/heme.pdb" : "../data/receptor.pdb";
     fetch(arq).then(r => r.text()).then(txt => {
       view.addModel(txt, "pdb");
-      if (v === "4" || v === "6" || v === "7") {
+      if (["4","6","7","8","9"].includes(v)) {
         // mesmo cinza do site. O heme entra em laranja porque a 32px a forma
         // da proteina some, mas um ponto de cor no meio ainda se enxerga.
-        view.setStyle({}, {cartoon: {color: claro ? "#e8edf1" : "#7d8a96", opacity: 0.96}});
+        const corProt = (v === "8") ? "#3d4348" : (v === "9") ? "#0e7c6b"
+          : (claro ? "#e8edf1" : "#7d8a96");
+        view.setStyle({}, {cartoon: {color: corProt, opacity: 1}});
         fetch("../data/heme.pdb").then(r => r.text()).then(h => {
           view.addModel(h, "pdb");
           view.setStyle({model: 1}, {stick: {radius: 0.5, color: claro ? "#ffb056" : "#c2410c"}});
