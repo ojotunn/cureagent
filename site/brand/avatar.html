@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ehrlich — avatar</title>
+<style>
+  /* Avatar do X: 400x400, exibido em circulo e reduzido a 32px na timeline.
+     Por isso: uma forma so, contraste alto, zero detalhe fino.
+     Variantes por ?v=1|2|3 */
+  :root{
+    --accent:#0e7c6b; --paper:#fbfbfa; --ink:#16191c; --line2:#e8ebe9;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:400px;height:400px;overflow:hidden;display:flex;
+       align-items:center;justify-content:center;font-family:var(--mono)}
+
+  .card{width:400px;height:400px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;position:relative;overflow:hidden}
+
+  /* v1 — verde solido, numero branco. O mais forte na timeline. */
+  body.v1 .card{background:var(--accent);color:#fff}
+  body.v1 .num{font-size:150px;font-weight:680;letter-spacing:-.045em}
+  body.v1 .sub{font-size:16px;letter-spacing:.34em;opacity:.72;margin-top:10px;
+    text-transform:uppercase}
+
+  /* v2 — papel, numero escuro, anel verde */
+  body.v2 .card{background:var(--paper);color:var(--ink);
+    background-image:linear-gradient(var(--line2) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+    background-size:34px 34px}
+  body.v2 .card::after{content:"";position:absolute;inset:34px;border-radius:50%;  /* o X recorta em circulo: o anel precisa de folga */
+    border:8px solid var(--accent)}
+  body.v2 .num{font-size:132px;font-weight:680;letter-spacing:-.045em;position:relative}
+  body.v2 .sub{font-size:14px;letter-spacing:.3em;color:var(--accent);margin-top:8px;
+    text-transform:uppercase;position:relative}
+
+  /* v3 — inicial, para quem prefere letra a numero */
+  body.v3 .card{background:var(--accent);color:#fff}
+  body.v3 .num{font-size:236px;font-weight:660;letter-spacing:-.06em;line-height:1}
+  body.v3 .sub{display:none}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="num" id="n">606</div>
+  <div class="sub" id="s">Ehrlich</div>
+</div>
+<script>
+  const v = new URLSearchParams(location.search).get("v") || "1";
+  document.body.className = "v" + v;
+  if (v === "3") document.getElementById("n").textContent = "E";
+</script>
+</body>
+</html>

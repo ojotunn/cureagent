@@ -27,3 +27,6 @@ results/*.png
 __pycache__/
 *.pyc
 .venv/
+
+# campanhas arquivadas pelo reset.py: pesadas e reproduziveis
+results/arquivo/

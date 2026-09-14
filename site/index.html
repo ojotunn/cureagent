@@ -335,6 +335,14 @@
     <div id="feed"></div>
   </section>
 
+  <section id="secHist" hidden>
+    <h2>Previous campaigns</h2>
+    <p class="note">Targets this project has worked on before. Kept on purpose:
+       knowing which target a method fails on is a result, and it saves the next
+       group the same weeks.</p>
+    <div class="ladder" id="hist" style="margin-top:14px"></div>
+  </section>
+
 </div>
 
 <!-- ====================== ABA 3 — COMO FUNCIONA ====================== -->
@@ -562,8 +570,9 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
   const alvo = d.alvo || {}, t = d.triagem || {}, v = d.validacao || {};
   const enr = v.enriquecimento || {};
 
-  $("#estado").textContent =
-    `target ${alvo.nome || "?"} · validation ${(alvo.estado || "unknown").toUpperCase()} · GPU spent $${(t.custo_gpu_usd ?? 0).toFixed(2)}`;
+  $("#estado").textContent = alvo && alvo.nome
+    ? `target ${alvo.nome} · validation ${(alvo.estado || "unknown").toUpperCase()} · GPU spent $${(t.custo_gpu_usd ?? 0).toFixed(2)}`
+    : "no target selected yet · nothing screened";
 
   $("#nums").innerHTML = [
     [fmt(t.moleculas_triadas), "molecules docked", t.onde_rodou || ""],
@@ -572,11 +581,22 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     ["0", "tokens launched", "nothing is for sale yet"],
   ].map(([b, s, sm]) => `<div class="num"><b>${b}</b><span>${s}</span><small>${sm}</small></div>`).join("");
 
+  const temAlvo = !!(alvo && alvo.nome);
+  if (!temAlvo) {
+    $("#alvo").innerHTML = `<h3>No target selected yet</h3>
+      <p class="note">The next campaign's protein, its disease and the structure
+         used for screening appear here once a target passes validation.</p>`;
+    $("#rejeicao").textContent =
+      "Nothing has been screened under this target yet.";
+    const vp = document.querySelector(".viewport");
+    if (vp) vp.style.display = "none";
+    document.querySelector(".legend").style.display = "none";
+  } else
   $("#alvo").innerHTML = `<h3>${alvo.nome_longo || alvo.nome || ""}</h3>
     <p class="note">${alvo.doenca_nota || ""}</p>
     <div class="kv"><span>disease</span><b>${alvo.doenca || "—"}</b></div>
     <div class="kv"><span>screening structure</span><b>PDB ${alvo.pdb_triagem || "—"}</b></div>
-    <div class="kv"><span>structures analysed</span><b>${(alvo.pdb_validacao || []).length + 1}</b></div>
+    <div class="kv"><span>structures analysed</span><b>${alvo.pdb_validacao ? alvo.pdb_validacao.length + 1 : "—"}</b></div>
     <div class="kv"><span>measured inhibitors</span><b>${alvo.chembl_alvo || "—"}</b></div>
     <div class="kv"><span>largest published screen</span><b>${fmt(alvo.recorde_publicado)}</b></div>`;
   $("#rejeicao").textContent = alvo.estado_nota || "";
@@ -622,6 +642,11 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
 
   const rk = t.ranking || [];
   $("#nmol").textContent = fmt(rk.length);
+  if (!rk.length) {
+    $("#ranking").closest(".tablewrap").innerHTML =
+      `<p class="note" style="padding:22px">No molecules screened yet. This table
+        fills as the engine works.</p>`;
+  } else
   $("#ranking").innerHTML =
     `<thead><tr><th>#</th><th>compound</th><th>score (kcal/mol)</th><th>class</th><th>measured potency</th></tr></thead><tbody>` +
     rk.map((r, i) => `<tr class="${r.tipo === "active" ? "active" : ""}">
@@ -657,6 +682,22 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
       <em>${x.linhas ? fmt(x.linhas) + " rows · " : ""}download</em>
     </a>`).join("");
 
+  const hist = d.historico || [];
+  if (hist.length) {
+    document.getElementById("secHist").hidden = false;
+    document.getElementById("hist").innerHTML = hist.map((h, i) => `
+      <div class="rung locked"><em>${i + 1}</em>
+        <div>
+          <h4>${esc(h.alvo || "?")}${h.doenca ? " — " + esc(h.doenca) : ""}</h4>
+          <p>${fmt(h.moleculas || 0)} molecules screened${h.pdb ? " · PDB " + esc(h.pdb) : ""}${h.encerrado_em ? " · closed " + esc(h.encerrado_em) : ""}</p>
+        </div>
+        <div class="st">
+          <b class="custo">${h.auc ? "AUC " + h.auc.toFixed(3) : "—"}</b>
+          <span class="conf ${h.veredicto === "rejected" ? "estimated" : "measured"}">${esc(h.veredicto || "closed")}</span>
+        </div>
+      </div>`).join("");
+  }
+
   $("#roadmap").innerHTML = (d.roadmap || []).map(s => `
     <div class="rung ${s.estado}"><em>${s.fase}</em>
       <div>
@@ -681,6 +722,7 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
 
   /* ---------------- 3D ---------------- */
   const el = $("#viewer");
+  if (!temAlvo) return;
   if (!window.$3Dmol) {
     el.innerHTML = `<div class="fallback">3D viewer unavailable — every measured
       number on this page is still shown.</div>`;
