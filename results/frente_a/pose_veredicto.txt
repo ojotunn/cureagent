@@ -1,0 +1,52 @@
+patch aplicado
+=== rodando ===
+      NGLH       heavy_miss=7 heavy_excess=1 H_excess=[] bond_miss=set() bond_excess=set()
+      CGLH       heavy_miss=8 heavy_excess=1 H_excess=[] bond_miss={5} bond_excess={1}
+      
+      matched with excess inter-residue bond(s): A:86
+
+1U9Q_186
+  superposto pela cadeia X (a do ligante): Ca RMSD 0.29 A
+  ligante a 2.3 A do centro do sitio catalitico
+  pronto (caixa nativa [19.5 16.8 25. ])
+
+1AIM (receptor de triagem)
+  ok
+
+==========================================================================
+TESTE 1 — REDOCKING no proprio cristal
+==========================================================================
+  4W5C_3H7       -5.78 kcal/mol  pose1 =  2.65 A  melhor =  2.65 A
+  4W5B_3H5       -6.55 kcal/mol  pose1 =  7.56 A  melhor =  2.22 A
+  4W5C_3H6       -7.42 kcal/mol  pose1 =  8.37 A  melhor =  1.67 A
+  4KLB_1RV       -5.77 kcal/mol  pose1 =  3.67 A  melhor =  3.67 A
+  1U9Q_186       -6.26 kcal/mol  pose1 =  9.76 A  melhor =  4.82 A
+
+==========================================================================
+TESTE 2 — CROSS-DOCKING no 1AIM, caixa e exhaustiveness de PRODUCAO
+==========================================================================
+  4W5C_3H7       -4.86 kcal/mol  pose1 =  3.20 A  melhor =  3.20 A
+  4W5B_3H5       -6.37 kcal/mol  pose1 =  8.08 A  melhor =  2.47 A
+  4W5C_3H6       -6.45 kcal/mol  pose1 =  6.39 A  melhor =  3.03 A
+  4KLB_1RV       -5.64 kcal/mol  pose1 =  7.21 A  melhor =  4.03 A
+  1U9Q_186       -6.18 kcal/mol  pose1 =  9.78 A  melhor =  1.18 A
+
+==========================================================================
+VEREDICTO
+==========================================================================
+REDOCK  4W5C_3H7     aff=  -5.78  pose1= 2.65  melhor= 2.65  -> FALHOU
+REDOCK  4W5B_3H5     aff=  -6.55  pose1= 7.56  melhor= 2.22  -> FALHOU
+REDOCK  4W5C_3H6     aff=  -7.42  pose1= 8.37  melhor= 1.67  -> recuperada
+REDOCK  4KLB_1RV     aff=  -5.77  pose1= 3.67  melhor= 3.67  -> FALHOU
+REDOCK  1U9Q_186     aff=  -6.26  pose1= 9.76  melhor= 4.82  -> FALHOU
+CROSS   4W5C_3H7     aff=  -4.86  pose1= 3.20  melhor= 3.20  -> FALHOU
+CROSS   4W5B_3H5     aff=  -6.37  pose1= 8.08  melhor= 2.47  -> FALHOU
+CROSS   4W5C_3H6     aff=  -6.45  pose1= 6.39  melhor= 3.03  -> FALHOU
+CROSS   4KLB_1RV     aff=  -5.64  pose1= 7.21  melhor= 4.03  -> FALHOU
+CROSS   1U9Q_186     aff=  -6.18  pose1= 9.78  melhor= 1.18  -> recuperada
+
+REDOCK: 0/5 com pose 1 dentro de 2,0 A
+
+CROSS: 0/5 com pose 1 dentro de 2,0 A
+
+[exited with code 0]

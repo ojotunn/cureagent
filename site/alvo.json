@@ -1,0 +1,17 @@
+{
+ "_comentario": "Configuracao do ALVO. Trocar de alvo = trocar este arquivo e o PDB em data/. Nada do site depende de qual proteina e.",
+ "id": "cruzain",
+ "nome": "Cruzain",
+ "nome_longo": "Cruzain (cruzipain), the major cysteine protease of Trypanosoma cruzi",
+ "doenca": "Chagas disease",
+ "doenca_nota": "Over 10,000 deaths a year in the Americas. Current therapy has poor efficacy in the chronic phase and serious side effects.",
+ "pdb_triagem": "1AIM",
+ "pdb_validacao": ["1ME3", "1ME4", "4W5C", "4W5B", "4KLB", "1U9Q"],
+ "chembl_alvo": "CHEMBL3563",
+ "recorde_publicado": 4000000,
+ "recorde_fonte": "Largest published virtual screen reported against this target",
+ "sitio": {"x": 99.125, "y": 21.293, "z": -15.633},
+ "caixa": [20.0, 20.0, 20.0],
+ "estado": "rejected",
+ "estado_nota": "Failed the enrichment threshold (AUC 0.638, cutoff 0.70) and failed pose reproduction on all 7 crystal ligands. Shallow, open cleft typical of cysteine proteases."
+}

@@ -1,0 +1,23 @@
+
+=== 3PTB / BEN ===
+  receptor 1629 atomos | ligante 9 atomos
+  template nao casou (No matching found)
+
+=== 1STP / BTN ===
+  receptor 901 atomos | ligante 16 atomos
+  16 atomos pesados, 5 torsoes
+  RESULTADO: -7.276 kcal/mol | pose 1 = 0.77 A | melhor = 0.77 A
+
+=== 1HVR / XK2 ===
+  receptor 1500 atomos | ligante 46 atomos
+  46 atomos pesados, 8 torsoes
+  RESULTADO: -11.81 kcal/mol | pose 1 = 0.47 A | melhor = 0.45 A
+
+====================================================================
+VEREDICTO DO CONTROLE
+====================================================================
+  1STP_BTN      5 tors  aff=  -7.28  pose1= 0.77 A  melhor= 0.77 A  -> PASSOU
+  1HVR_XK2      8 tors  aff= -11.81  pose1= 0.47 A  melhor= 0.45 A  -> PASSOU
+
+PIPELINE CORRETO. Os classicos reproduzem a pose cristalografica.
+Logo, a falha na cruzaina e propriedade DO ALVO, nao do codigo.

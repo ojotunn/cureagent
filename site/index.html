@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Million Keys</title>
+<style>
+  :root{
+    --paper:#fbfbfa; --card:#ffffff; --line:#e4e6e4; --line2:#f0f1ef;
+    --ink:#16191c; --ink2:#3d4348; --dim:#767d84;
+    --accent:#0e7c6b; --accent-soft:#e6f4f1;
+    --pass:#15803d; --fail:#b3261e; --warn:#a15c00;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;color:var(--ink);font-family:var(--sans);line-height:1.6;
+    background-color:var(--paper);
+    background-image:linear-gradient(var(--line2) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+    background-size:28px 28px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1140px;margin:0 auto;padding-inline:20px}
+
+  /* ---------- cabecalho ---------- */
+  header{background:var(--card);border-bottom:1px solid var(--line)}
+  .top{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;
+       justify-content:space-between;padding-block:30px 22px}
+  h1{font-size:clamp(25px,4.2vw,38px);margin:0;letter-spacing:-.025em;font-weight:660}
+  .motto{font-family:var(--mono);color:var(--accent);font-size:13.5px;margin-top:6px}
+  .state{font-family:var(--mono);font-size:11.5px;color:var(--dim);
+    border:1px solid var(--line);border-radius:999px;padding:6px 13px;background:var(--paper)}
+  .state .dot{display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:var(--warn);margin-right:7px;vertical-align:1px}
+
+  nav{display:flex;gap:4px;overflow-x:auto;border-top:1px solid var(--line2)}
+  nav button{
+    appearance:none;background:none;border:0;border-bottom:2px solid transparent;
+    padding:13px 16px;font:inherit;font-size:14px;color:var(--dim);cursor:pointer;
+    white-space:nowrap;letter-spacing:.01em}
+  nav button:hover{color:var(--ink2)}
+  nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:560}
+
+  /* ---------- blocos ---------- */
+  main{padding-block:34px 70px}
+  section{margin-bottom:34px}
+  h2{font-size:11.5px;text-transform:uppercase;letter-spacing:.14em;color:var(--dim);
+     margin:0 0 16px;font-weight:620}
+  h3{font-size:16px;margin:0 0 10px;font-weight:620;letter-spacing:-.01em}
+  p{margin:0 0 14px}
+  .lead{font-size:17px;color:var(--ink2);max-width:66ch}
+  .note{color:var(--dim);font-size:13.5px;max-width:72ch}
+  .note strong,.lead strong{color:var(--ink);font-weight:600}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px}
+  .card + .card{margin-top:14px}
+
+  .nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:13px}
+  .num{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:17px 18px}
+  .num b{display:block;font-family:var(--mono);font-size:clamp(21px,3.2vw,28px);
+         font-weight:620;letter-spacing:-.02em}
+  .num span{display:block;color:var(--dim);font-size:11px;margin-top:5px;
+            text-transform:uppercase;letter-spacing:.09em}
+  .num small{display:block;color:var(--dim);font-size:12px;margin-top:8px;opacity:.9}
+
+  .split{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:start}
+  .split3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+  @media(max-width:880px){.split{grid-template-columns:1fr}}
+
+  #viewer{position:relative;width:100%;max-width:100%;height:440px;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  #viewer .fallback{position:absolute;inset:0;display:flex;align-items:center;
+    justify-content:center;color:var(--dim);font-family:var(--mono);font-size:12.5px;
+    text-align:center;padding:24px}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12px;
+    color:var(--dim);font-family:var(--mono)}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;
+    margin-right:6px;vertical-align:middle;border:1px solid rgba(0,0,0,.12)}
+
+  .kv{display:flex;justify-content:space-between;gap:14px;padding:8px 0;
+      border-bottom:1px solid var(--line2);font-size:14px}
+  .kv:last-child{border-bottom:0}
+  .kv span{color:var(--dim)}
+  .kv b{font-family:var(--mono);font-weight:620}
+  .pass{color:var(--pass)} .fail{color:var(--fail)} .warnc{color:var(--warn)}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+  .scroll{max-height:440px;overflow-y:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px;font-family:var(--mono)}
+  th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--line2);white-space:nowrap}
+  th{color:var(--dim);font-weight:520;font-size:10.5px;text-transform:uppercase;
+     letter-spacing:.09em;position:sticky;top:0;background:var(--card);
+     box-shadow:inset 0 -1px 0 var(--line)}
+  tr:last-child td{border-bottom:0}
+  tr.active td{color:var(--accent);font-weight:560}
+  tr.active td:first-child::before{content:"▸ ";opacity:.6}
+
+  /* ---------- escada / roadmap ---------- */
+  .ladder{display:grid;gap:9px}
+  .rung{display:grid;grid-template-columns:30px 1fr auto;gap:15px;align-items:center;
+    background:var(--card);border:1px solid var(--line);border-radius:11px;padding:14px 17px}
+  .rung em{font-family:var(--mono);font-style:normal;color:var(--dim);font-size:12.5px}
+  .rung .st{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.08em;color:var(--dim);text-align:right}
+  .rung.done{border-color:#cfe7d8;background:#fafdfb}
+  .rung.done .st{color:var(--pass)}
+  .rung.next{border-color:#f0dfc0;background:#fffdf8}
+  .rung.next .st{color:var(--warn)}
+  .rung.locked{opacity:.58}
+  .rung.theirs{background:var(--paper);border-style:dashed}
+  .rung h4{margin:0;font-size:14.5px;font-weight:580}
+  .rung p{margin:2px 0 0;font-size:12.5px;color:var(--dim)}
+
+  ol.steps{counter-reset:s;list-style:none;padding:0;margin:0}
+  ol.steps li{counter-increment:s;position:relative;padding-left:44px;margin-bottom:20px}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:28px;
+    height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+    font-family:var(--mono);font-size:13px;display:flex;align-items:center;justify-content:center;
+    font-weight:620}
+  ol.steps h4{margin:0 0 5px;font-size:15px;font-weight:600}
+  ol.steps p{margin:0;color:var(--ink2);font-size:14px;max-width:68ch}
+
+  .rule{border:0;border-top:1px solid var(--line);margin:30px 0}
+  .quote{border-left:3px solid var(--accent);padding:2px 0 2px 16px;color:var(--ink2);
+    font-size:15px;margin:18px 0}
+  .never{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .never span{font-family:var(--mono);font-size:12px;border:1px solid #f0d2cf;
+    background:#fdf5f4;color:var(--fail);border-radius:6px;padding:4px 10px;
+    text-decoration:line-through}
+  code{font-family:var(--mono);background:var(--paper);border:1px solid var(--line);
+    padding:2px 6px;border-radius:5px;font-size:12.5px}
+
+  /* ---------- feed de resultados ---------- */
+  .post{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px;margin-bottom:12px}
+  .post header{background:none;border:0;display:flex;flex-wrap:wrap;gap:11px;
+    align-items:center;margin-bottom:9px;padding:0}
+  .post time{font-family:var(--mono);font-size:12px;color:var(--dim)}
+  .tag{font-family:var(--mono);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.08em;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+  .tag.validation{background:var(--accent-soft);color:var(--accent);border-color:#c7e6df}
+  .tag.screening{background:#eef2f7;color:#2c5282;border-color:#d4e0ee}
+  .tag.decision{background:#fdf4e7;color:var(--warn);border-color:#f0dfc0}
+  .tag.data{background:var(--paper);color:var(--dim)}
+  .tag.receipt{background:#eefaf1;color:var(--pass);border-color:#cfe7d8}
+  .post h3{margin:0 0 8px;font-size:17px;letter-spacing:-.015em}
+  .post p{color:var(--ink2);font-size:14.5px;max-width:70ch;margin:0}
+  .postnums{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+  .postnums div{border:1px solid var(--line);border-radius:9px;padding:9px 13px;
+    background:var(--paper);min-width:120px}
+  .postnums b{display:block;font-family:var(--mono);font-size:15px;font-weight:620}
+  .postnums span{display:block;font-size:10.5px;color:var(--dim);margin-top:3px;
+    text-transform:uppercase;letter-spacing:.07em}
+  .src{margin-top:14px;font-family:var(--mono);font-size:11.5px;color:var(--dim);
+    padding-top:12px;border-top:1px solid var(--line2)}
+  .src b{font-weight:520;color:var(--ink2)}
+  .dl{display:block;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:19px;text-decoration:none;color:inherit}
+  .dl:hover{border-color:var(--accent)}
+  .dl b{display:block;font-size:15px;font-weight:600;margin-bottom:6px}
+  .dl span{display:block;color:var(--dim);font-size:13px}
+  .dl em{display:block;font-family:var(--mono);font-style:normal;font-size:11.5px;
+    color:var(--accent);margin-top:11px}
+  footer{border-top:1px solid var(--line);background:var(--card);
+    padding-block:26px 44px;color:var(--dim);font-size:12.5px}
+  footer p{margin:0 0 8px;max-width:80ch}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>A Million Keys</h1>
+        <div class="motto">We screen. We publish. We promise nothing else.</div>
+      </div>
+      <div class="state"><span class="dot"></span><span id="estado">loading…</span></div>
+    </div>
+    <nav role="tablist">
+      <button role="tab" aria-selected="true"  data-tab="agent">The agent at work</button>
+      <button role="tab" aria-selected="false" data-tab="results">Results</button>
+      <button role="tab" aria-selected="false" data-tab="how">How it works</button>
+      <button role="tab" aria-selected="false" data-tab="road">Roadmap</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ====================== ABA 1 — O AGENTE TRABALHANDO ====================== -->
+<div id="tab-agent" role="tabpanel">
+
+  <section>
+    <h2>Work done so far</h2>
+    <div class="nums" id="nums"></div>
+  </section>
+
+  <section>
+    <h2>The target on the bench</h2>
+    <div class="split">
+      <div>
+        <div id="viewer"><div class="fallback">loading structure…</div></div>
+        <div class="legend">
+          <span><i style="background:#7d8a96"></i>protein backbone</span>
+          <span><i style="background:#0e7c6b"></i>residues lining the site</span>
+          <span><i style="background:#c2410c"></i>reference ligand</span>
+        </div>
+      </div>
+      <div>
+        <div class="card" id="alvo"></div>
+        <div class="card">
+          <h3>Status of this target</h3>
+          <p class="note" id="rejeicao"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Is the method sound? — three checks, all published</h2>
+    <div class="split3">
+      <div class="card">
+        <h3>1 · Positive control</h3>
+        <p class="note">The same pipeline on textbook redocking cases. Separates
+           "the code is wrong" from "this target is hard".</p>
+        <div id="controle"></div>
+      </div>
+      <div class="card">
+        <h3>2 · Enrichment</h3>
+        <p class="note">Measured inhibitors vs property-matched decoys. The test
+           that matters for screening: ranking, not pose.</p>
+        <div id="enriquecimento"></div>
+      </div>
+      <div class="card">
+        <h3>3 · Pose reproduction</h3>
+        <p class="note">Can a known ligand be put back where the crystal shows it
+           is? Threshold 2.0 Å.</p>
+        <div id="poseresumo"></div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h3>Every crystal ligand tested, pass and fail</h3>
+      <div class="tablewrap" style="margin-top:12px"><table id="pose"></table></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Screening output — <span id="nmol"></span> molecules, ranked</h2>
+    <p class="note">Every molecule from the run above, best score first. Known
+       inhibitors are marked. Decoys sitting near the top are the method failing,
+       and they are shown exactly as they came out.</p>
+    <div class="tablewrap scroll" style="margin-top:13px"><table id="ranking"></table></div>
+  </section>
+
+</div>
+
+<!-- ====================== ABA 2 — RESULTADOS PUBLICADOS ====================== -->
+<div id="tab-results" role="tabpanel" hidden>
+
+  <section>
+    <h2>The record</h2>
+    <p class="lead">Everything the agent has published, newest first. Each entry
+       carries the timestamp of the file that produced it and a link to that
+       file, so any claim here can be traced back to the run that made it —
+       including the ones that went badly.</p>
+  </section>
+
+  <section>
+    <h2>Published data</h2>
+    <div class="split3" id="downloads"></div>
+    <p class="note" style="margin-top:13px">Public domain, no attribution
+       required, no account needed. Failed runs are included on purpose: knowing
+       which method does <em>not</em> work on a target saves the next person the
+       same weeks.</p>
+  </section>
+
+  <section>
+    <h2>Posts</h2>
+    <div id="feed"></div>
+  </section>
+
+</div>
+
+<!-- ====================== ABA 3 — COMO FUNCIONA ====================== -->
+<div id="tab-how" role="tabpanel" hidden>
+
+  <section>
+    <h2>In one paragraph</h2>
+    <p class="lead">Some diseases have no research money because the patients are
+       poor. The science is not missing — the funding is. This project rents
+       computing power and uses it to test millions of molecules against a
+       protein that one of those diseases depends on, then publishes everything
+       it finds, free, including the runs that fail.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <h2>The science, without jargon</h2>
+    <div class="split3">
+      <div class="card">
+        <h3>The lock</h3>
+        <p class="note">Every parasite depends on proteins that do a specific job.
+           Block the right one and the parasite stops. That protein is the lock.</p>
+      </div>
+      <div class="card">
+        <h3>The keys</h3>
+        <p class="note">Public catalogues list <strong>billions</strong> of real,
+           purchasable molecules. Any of them could be the key. Nobody knows which.</p>
+      </div>
+      <div class="card">
+        <h3>The trying</h3>
+        <p class="note">A computer can turn each key in the lock and score how well
+           it fits. That is called docking, and it eats graphics-card time — which
+           is exactly what money buys.</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:14px">Testing keys in a laboratory costs
+       real money per molecule. Testing them in a computer costs a fraction of a
+       cent. That difference is the entire reason this project can exist at all.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <h2>What actually happens, step by step</h2>
+    <ol class="steps">
+      <li>
+        <h4>Pick a structure and prove it is usable</h4>
+        <p>Crystal structures of the target are downloaded from the public
+           protein bank. Any structure whose ligand is chemically bonded to the
+           protein is rejected — docking cannot reproduce that, and using one
+           silently poisons every result that follows.</p>
+      </li>
+      <li>
+        <h4>Run a positive control</h4>
+        <p>Before trusting anything, the same pipeline runs on famous, easy cases
+           where the right answer is already known. If it cannot reproduce those,
+           nothing else it says counts.</p>
+      </li>
+      <li>
+        <h4>Measure whether the method works on this target</h4>
+        <p>Inhibitors that were measured in real laboratories are mixed with
+           look-alike molecules that are presumed inactive. The method should push
+           the real ones to the top. The pass mark is fixed <em>before</em> the
+           run, never after seeing the number.</p>
+      </li>
+      <li>
+        <h4>Screen at scale</h4>
+        <p>Only once the checks pass does the project rent GPUs and start working
+           through the catalogue, batch by batch, publishing the score of every
+           molecule it touches.</p>
+      </li>
+      <li>
+        <h4>Buy the best ones and put them on a bench</h4>
+        <p>Top candidates are ordered from a chemical supplier and sent to a real
+           laboratory, with the assay paid for. That is where a computer result
+           becomes an experiment.</p>
+      </li>
+    </ol>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <h2>Where the money goes</h2>
+    <div class="card">
+      <p>Every fee becomes computing time.</p>
+      <p class="note" style="margin-top:14px">No GPU runs when nothing is being
+         paid for, so an idle project costs nothing and simply stops — visibly,
+         on this page. Receipts for what was spent are published here.</p>
+    </div>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <h2>Who picks it up from here</h2>
+    <p class="note">Everything produced goes into the public domain immediately —
+       scores, poses, the compounds tested, and the runs that failed. Open
+       consortia and academic groups already work on neglected diseases and can
+       use the data; the model of shipping free compounds to labs that want to
+       test them has worked before. The project claims no partnership it does not
+       have, and announces none before it exists.</p>
+    <p class="note">Steps beyond the bench — medicinal chemistry, animal studies,
+       clinical trials — are not ours and are not funded here. They are marked as
+       such on the roadmap.</p>
+  </section>
+
+</div>
+
+<!-- ====================== ABA 3 — ROADMAP ====================== -->
+<div id="tab-road" role="tabpanel" hidden>
+
+  <section>
+    <h2>Roadmap — each step priced, each step a receipt</h2>
+    <p class="note">Costs are what the project will <strong>spend</strong>. A step
+       unlocks when its cost is covered, and when it is paid the receipt is
+       published here with the date. Prices that have not been confirmed with a
+       supplier or a laboratory are shown as not priced rather than guessed.</p>
+    <div class="ladder" id="roadmap" style="margin-top:18px"></div>
+  </section>
+
+  <section>
+    <h2>The full ladder, and who pays which rung</h2>
+    <div class="ladder">
+      <div class="rung done"><em>1</em>
+        <div><h4>Virtual screening</h4><p>Days. Hundreds of dollars of GPU. Millions of molecules.</p></div>
+        <div class="st">ours</div></div>
+      <div class="rung"><em>2</em>
+        <div><h4>Buy the compounds</h4><p>About three weeks. Made to order by a chemical supplier.</p></div>
+        <div class="st">ours</div></div>
+      <div class="rung"><em>3</em>
+        <div><h4>Enzyme assay</h4><p>Weeks. Does the molecule actually block the protein?</p></div>
+        <div class="st">ours</div></div>
+      <div class="rung"><em>4</em>
+        <div><h4>Cell assay</h4><p>Months. Does it kill the parasite without killing human cells?</p></div>
+        <div class="st">ours, at the limit</div></div>
+      <div class="rung theirs locked"><em>5</em>
+        <div><h4>Medicinal chemistry</h4><p>One to three years. Hundreds of variants to make it potent and safe.</p></div>
+        <div class="st">not ours</div></div>
+      <div class="rung theirs locked"><em>6</em>
+        <div><h4>Animal studies and toxicology</h4><p>Two to three years. Millions of dollars.</p></div>
+        <div class="st">not ours</div></div>
+      <div class="rung theirs locked"><em>7</em>
+        <div><h4>Human trials</h4><p>Five to eight years. Tens to hundreds of millions.</p></div>
+        <div class="st">not ours</div></div>
+    </div>
+    <p class="note" style="margin-top:16px">Rungs five to seven are shown so the
+       distance is honest, not to suggest this project will climb them. It will
+       not. It does one to four and hands the data to whoever does the rest.</p>
+  </section>
+
+</div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Method: AutoDock Vina 1.2.5 · Meeko 0.8 · RDKit · gemmi. Receptor
+       preparation, box centre and size, random seeds and exhaustiveness are all
+       recorded with the project, so any run here can be repeated exactly.</p>
+    <p>Structures from the RCSB Protein Data Bank. Measured activities from
+       ChEMBL. Compound libraries are used, never redistributed.</p>
+    <p id="recibo"></p>
+  </div>
+</footer>
+
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const fmt = n => (n === null || n === undefined) ? "—" : n.toLocaleString("en-US");
+let viewer3d = null;
+
+/* ---------------- abas ---------------- */
+const ABAS = ['agent', 'results', 'how', 'road'];
+
+function mostraAba(nome, rolar) {
+  if (!ABAS.includes(nome)) nome = 'agent';
+  document.querySelectorAll('nav button').forEach(x =>
+    x.setAttribute('aria-selected', String(x.dataset.tab === nome)));
+  ABAS.forEach(t => document.getElementById('tab-' + t).hidden = (t !== nome));
+  if (rolar) window.scrollTo({top: 0, behavior: 'instant'});
+  if (nome === 'agent' && viewer3d) {
+    // o canvas nasce com tamanho zero se a aba estava escondida
+    viewer3d.resize(); viewer3d.render();
+  }
+}
+
+document.querySelectorAll('nav button').forEach(b => {
+  b.addEventListener('click', () => {
+    history.replaceState(null, "", "#" + b.dataset.tab);
+    mostraAba(b.dataset.tab, true);
+  });
+});
+window.addEventListener('hashchange', () => mostraAba(location.hash.slice(1), true));
+mostraAba(location.hash.slice(1) || 'agent', false);
+
+/* ---------------- dados ---------------- */
+fetch("data/dados.json").then(r => r.json()).then(d => {
+  const alvo = d.alvo || {}, t = d.triagem || {}, v = d.validacao || {};
+  const enr = v.enriquecimento || {};
+
+  $("#estado").textContent =
+    `target ${alvo.nome || "?"} · validation ${(alvo.estado || "unknown").toUpperCase()} · GPU spent $${(t.custo_gpu_usd ?? 0).toFixed(2)}`;
+
+  $("#nums").innerHTML = [
+    [fmt(t.moleculas_triadas), "molecules docked", t.onde_rodou || ""],
+    ["$" + (t.custo_gpu_usd ?? 0).toFixed(2), "spent on GPU", "everything so far ran on local CPU"],
+    [enr.auc ? enr.auc.toFixed(3) : "—", "enrichment AUC", "0.50 = coin flip · 0.70 = useful"],
+    ["0", "tokens launched", "nothing is for sale yet"],
+  ].map(([b, s, sm]) => `<div class="num"><b>${b}</b><span>${s}</span><small>${sm}</small></div>`).join("");
+
+  $("#alvo").innerHTML = `<h3>${alvo.nome_longo || alvo.nome || ""}</h3>
+    <p class="note">${alvo.doenca_nota || ""}</p>
+    <div class="kv"><span>disease</span><b>${alvo.doenca || "—"}</b></div>
+    <div class="kv"><span>screening structure</span><b>PDB ${alvo.pdb_triagem || "—"}</b></div>
+    <div class="kv"><span>structures analysed</span><b>${(alvo.pdb_validacao || []).length + 1}</b></div>
+    <div class="kv"><span>measured inhibitors</span><b>${alvo.chembl_alvo || "—"}</b></div>
+    <div class="kv"><span>largest published screen</span><b>${fmt(alvo.recorde_publicado)}</b></div>`;
+  $("#rejeicao").textContent = alvo.estado_nota || "";
+
+  const ctrl = v.controle_positivo || [];
+  $("#controle").innerHTML = ctrl.length
+    ? ctrl.map(c => `<div class="kv"><span>${c.caso.replace("_"," / ")} · ${c.torsoes} rot. bonds</span>
+        <b class="${c.pose1 <= 2 ? "pass" : "fail"}">${c.pose1.toFixed(2)} Å</b></div>`).join("")
+      + `<p class="note" style="margin-top:11px">Sub-angstrom on both — the pipeline
+         reproduces crystal poses when the site allows it.</p>`
+    : `<p class="note">not measured yet</p>`;
+
+  if (enr.auc !== undefined) {
+    const ok = enr.auc >= 0.70;
+    $("#enriquecimento").innerHTML = `
+      <div class="kv"><span>AUC-ROC</span><b class="${ok ? "pass" : "fail"}">${enr.auc.toFixed(3)}</b></div>
+      <div class="kv"><span>EF 1% / 5% / 10%</span><b>${enr.ef1.toFixed(1)}× · ${enr.ef5.toFixed(1)}× · ${enr.ef10.toFixed(1)}×</b></div>
+      <div class="kv"><span>actives / decoys</span><b>${enr.n_ativos} / ${enr.n_decoys}</b></div>
+      <p class="note" style="margin-top:11px">Cutoff of 0.70 was fixed <strong>before</strong>
+         the run. ${ok ? "Passed." : "Did not pass."} Caveat we are not hiding: decoys came
+         from a library of bioactive compounds, which makes this harsher than the
+         usual inert-decoy benchmark.</p>`;
+  } else $("#enriquecimento").innerHTML = `<p class="note">not measured yet</p>`;
+
+  const pose = v.pose || [];
+  const okPose = pose.filter(p => p.pose1 <= 2).length;
+  const achou = pose.filter(p => p.pose1 > 2 && p.melhor <= 2).length;
+  $("#poseresumo").innerHTML = pose.length ? `
+    <div class="kv"><span>top pose within 2.0 Å</span><b class="${okPose ? "pass" : "fail"}">${okPose} / ${pose.length}</b></div>
+    <div class="kv"><span>right pose found but ranked wrong</span><b class="warnc">${achou}</b></div>
+    <p class="note" style="margin-top:11px">The correct answer is often among the
+       poses — it just is not the one the scoring puts first. In a shallow, open
+       site that is the expected failure.</p>` : `<p class="note">not measured yet</p>`;
+
+  $("#pose").innerHTML =
+    `<thead><tr><th>test</th><th>case</th><th>affinity</th><th>top pose</th><th>best of 9</th><th>verdict</th></tr></thead><tbody>` +
+    pose.map(p => `<tr><td>${p.tipo}</td><td>${p.caso.replace("_"," / ")}</td>
+      <td>${p.afinidade.toFixed(2)}</td>
+      <td class="${p.pose1 <= 2 ? "pass" : "fail"}">${p.pose1.toFixed(2)} Å</td>
+      <td class="${p.melhor <= 2 ? "warnc" : ""}">${p.melhor.toFixed(2)} Å</td>
+      <td>${p.pose1 <= 2 ? "pass" : (p.melhor <= 2 ? "found, ranked wrong" : "fail")}</td></tr>`).join("") +
+    `</tbody>`;
+
+  const rk = t.ranking || [];
+  $("#nmol").textContent = fmt(rk.length);
+  $("#ranking").innerHTML =
+    `<thead><tr><th>#</th><th>compound</th><th>score (kcal/mol)</th><th>class</th><th>measured potency</th></tr></thead><tbody>` +
+    rk.map((r, i) => `<tr class="${r.tipo === "active" ? "active" : ""}">
+      <td>${i + 1}</td><td>${r.id}</td><td>${r.score.toFixed(2)}</td>
+      <td>${r.tipo === "active" ? "known inhibitor" : "decoy"}</td>
+      <td>${r.nM ? r.nM.toFixed(1) + " nM" : "—"}</td></tr>`).join("") +
+    `</tbody>`;
+
+  /* ---------------- aba Results: feed e downloads ---------------- */
+  const esc = s => String(s).replace(/[&<>"]/g, c =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  const posts = (d.posts || []).slice().reverse();   // mais recente primeiro
+  $("#feed").innerHTML = posts.length ? posts.map(p => `
+    <article class="post">
+      <header>
+        <time>${esc(p.ts)}</time>
+        <span class="tag ${esc(p.tipo)}">${esc(p.tipo)}</span>
+      </header>
+      <h3>${esc(p.titulo)}</h3>
+      <p>${esc(p.corpo)}</p>
+      ${(p.numeros || []).length ? `<div class="postnums">` + p.numeros.map(
+        ([k, val]) => `<div><b>${esc(val)}</b><span>${esc(k)}</span></div>`).join("")
+        + `</div>` : ""}
+      <div class="src">source: <b>${esc(p.fonte)}</b></div>
+    </article>`).join("")
+    : `<p class="note">nothing published yet</p>`;
+
+  $("#downloads").innerHTML = (d.downloads || []).map(x => `
+    <a class="dl" href="${esc(x.arquivo)}" download>
+      <b>${esc(x.nome)}</b>
+      <span>${esc(x.descricao)}</span>
+      <em>${x.linhas ? fmt(x.linhas) + " rows · " : ""}download</em>
+    </a>`).join("");
+
+  $("#roadmap").innerHTML = (d.roadmap || []).map(s => `
+    <div class="rung ${s.estado}"><em>${s.fase}</em>
+      <div><h4>${s.nome}</h4></div>
+      <div class="st">${s.custo_usd === 0 ? "$0" : (s.custo_usd === null ? "not priced" : "$" + fmt(s.custo_usd))} · ${s.estado}</div>
+    </div>`).join("");
+
+  $("#recibo").textContent =
+    `Receipt: ${fmt(t.moleculas_triadas)} dockings, ${t.minutos} minutes on ${t.onde_rodou}, $${(t.custo_gpu_usd ?? 0).toFixed(2)} of rented compute. Page generated ${d.gerado_em}.`;
+
+  /* ---------------- 3D ---------------- */
+  const el = $("#viewer");
+  if (!window.$3Dmol) {
+    el.innerHTML = `<div class="fallback">3D viewer unavailable — every measured
+      number on this page is still shown.</div>`;
+    return;
+  }
+  el.innerHTML = "";
+  const view = $3Dmol.createViewer(el, {backgroundColor: "#ffffff"});
+  viewer3d = view;
+  Promise.all([
+    fetch("data/receptor.pdb").then(r => r.text()),
+    fetch("data/site_ref.pdb").then(r => r.text()).catch(() => null),
+  ]).then(([rec, lig]) => {
+    view.addModel(rec, "pdb");
+    view.setStyle({model: 0}, {cartoon: {color: "#7d8a96", opacity: 0.95}});
+    let temLig = false;
+    if (lig && lig.trim()) {
+      view.addModel(lig, "pdb");
+      temLig = true;
+      view.setStyle({model: 1}, {stick: {radius: 0.26, color: "#c2410c"}});
+      view.addStyle({model: 0, within: {distance: 8, sel: {model: 1}}},
+                    {stick: {radius: 0.12, color: "#0e7c6b"}});
+    }
+    view.zoomTo({model: 0});
+    view.zoom(1.15);
+    view.render();
+    view.spin("y", 0.3);
+    setTimeout(() => {
+      const cv = el.querySelector("canvas");
+      if (!cv || cv.width < 10) el.insertAdjacentHTML("beforeend",
+        `<div class="fallback">WebGL unavailable in this browser — the measured
+         numbers below are unaffected.</div>`);
+    }, 1500);
+  }).catch(e => { el.innerHTML = `<div class="fallback">structure failed to load — ${e}</div>`; });
+
+}).catch(e => {
+  document.body.insertAdjacentHTML("afterbegin",
+    `<pre style="color:#b3261e;padding:20px;font-family:monospace;white-space:pre-wrap">data/dados.json failed to load: ${e}
+
+Serve the folder over HTTP (run servir.bat) — opening the file directly blocks fetch().</pre>`);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+test,system,rotatable_bonds,affinity_kcal_mol,rmsd_top_pose_A,rmsd_best_of_9_A,passed_2A
+positive_control,1STP_BTN,5,-7.28,0.77,0.77,True
+positive_control,1HVR_XK2,8,-11.81,0.47,0.45,True
+redock,4W5C_3H7,,-5.78,2.65,2.65,False
+redock,4W5B_3H5,,-6.55,7.56,2.22,False
+redock,4W5C_3H6,,-7.42,8.37,1.67,False
+redock,4KLB_1RV,,-5.77,3.67,3.67,False
+redock,1U9Q_186,,-6.26,9.76,4.82,False
+cross,4W5C_3H7,,-4.86,3.2,3.2,False
+cross,4W5B_3H5,,-6.37,8.08,2.47,False
+cross,4W5C_3H6,,-6.45,6.39,3.03,False
+cross,4KLB_1RV,,-5.64,7.21,4.03,False
+cross,1U9Q_186,,-6.18,9.78,1.18,False

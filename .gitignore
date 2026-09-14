@@ -1,0 +1,29 @@
+# segredos — nunca subir
+.env
+.env.*
+*.key
+carteira*.json
+
+# binarios de terceiros (o README diz como baixar)
+tools/
+
+# estruturas baixadas do RCSB (os scripts baixam sozinhos)
+target/*.pdb
+target/*.sdf
+
+# saidas intermediarias de docking: milhares de arquivos pequenos,
+# reproduziveis rodando os scripts. O que importa esta consolidado
+# em site/data/dados.json
+results/frente_a/enriquecimento/ligs/
+results/frente_a/enriquecimento/docked/
+results/frente_a/enriquecimento/pool_decoys.json
+results/frente_a/pose/
+results/frente_a/controle/
+results/frente_a/*.pdbqt
+results/frente_a/*.sdf
+results/frente_a/*.pdb
+results/*.png
+
+__pycache__/
+*.pyc
+.venv/

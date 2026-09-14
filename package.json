@@ -1,0 +1,13 @@
+{
+  "name": "cureagent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A Million Keys — open virtual screening against a neglected-disease target",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
