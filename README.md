@@ -1,13 +1,10 @@
-# A Million Keys
+# Ehrlich
 
-Open virtual screening against a neglected-disease target, with every result
-published as it came out — including the ones that failed.
+**Open computational screening for neglected diseases. Every run published.**
 
-**We screen. We publish. We promise nothing else.**
-
-This repository contains no claim about curing, treating or discovering
-anything. It contains a docking pipeline, the runs it produced, and the numbers
-those runs gave.
+A structure-based virtual screening pipeline, the runs it has produced, and the
+data those runs generated — released openly so that other groups can build on
+it, including the negative results that usually never leave a hard drive.
 
 ---
 

@@ -1,6 +1,6 @@
-# A MILLION KEYS — SPEC congelada
+# EHRLICH — SPEC congelada
 
-**Ticker:** KEYS · **Rede:** Robinhood Chain (pons v2) · **Porta local:** 8440
+**Ticker:** EHRLICH · **Dominio:** ehrlich.bio · **Rede:** Robinhood Chain (pons v2) · **Porta local:** 8440
 **Data:** 13/09/2026 · **Estado:** FATIA 1 RODADA — alvo reprovado, ver seção 0
 
 ---
@@ -67,7 +67,12 @@ publicados abertos e o nome de quem financiou cada lote gravado no dado.
 O site, os posts e qualquer texto do projeto **nunca** usam: *cura, remédio,
 tratamento, descoberta, breakthrough*.
 
-O que se diz: **"We screen. We publish. We promise nothing else."**
+O lema, afirmativo e institucional: **"Open computational screening for neglected diseases. Every run published."**
+
+Dizer "nao prometemos nada" repetidamente e DEFENSIVO e custa
+credibilidade — quem se defende antes de ser acusado parece ter o que
+esconder. A honestidade vive nos DADOS (falhas publicadas, estimativa
+marcada como estimativa), nao em declaracao.
 
 O roadmap descreve o que o projeto **vai gastar**, nunca o que o comprador vai
 ganhar. Proibida qualquer frase do tipo "quando bater X, o token vale Y".
