@@ -125,6 +125,27 @@ amount."* Recibo publicado vale mais que automação fingida.
 para os dois destinos fixos (cofre e criador). Teto diário de gasto com Claude
 configurável, com corte automático.
 
+## 3.1 Contabilidade que o agente LÊ da chain (sem carteira)
+
+Verificado em 14/09 num token real da pons: `token_info` devolve
+`creatorFeeRecipient`, `creatorTaxBps`, o endereço da `curve`, `raisedEth`,
+preço, market cap e progresso de graduação. O explorer da Robinhood Chain
+(Blockscout) expõe transações de qualquer endereço por API aberta.
+
+Logo o agente publica, sozinho e sem tocar em dinheiro:
+
+| Número | Como obtém |
+|---|---|
+| ETH arrecadado na curva | `token_info.raisedEth` |
+| Fees geradas para o criador | eventos de trade da curva × taxa |
+| Saques do criador (data e valor) | transações do `creatorFeeRecipient` no explorer |
+| Horas de placa consumidas e custo | medição do próprio agente, que liga o pod |
+
+O único elo fora da chain é **ETH → crédito na RunPod** (acontece em cartão).
+Esse é recibo publicado pelo Michel — mas com os dois lados verificáveis:
+entrou X (chain), consumiu Y (medido). A tela mostra os quatro números lado a
+lado e a diferença, sem esconder o elo manual.
+
 ## 4. O alvo científico
 
 - **Proteína:** cruzaína (cisteíno-protease de *Trypanosoma cruzi*), alvo
