@@ -46,10 +46,10 @@ MK_LIG = os.path.join(SCRIPTS, "mk_prepare_ligand.exe")
 VINA = os.path.join(BASE, "tools", "vina.exe")
 API = "https://www.ebi.ac.uk/chembl/api/data"
 
-RECEPTOR = os.path.join(WORK, "1AIM_rec.pdbqt")
+RECEPTOR = os.path.join(WORK, "pose", "3KHM_TPF_rec.pdbqt")  # com heme anexado
 # caixa centrada no sitio (centroide dos ligantes cristalograficos), 20 A cubica
-CENTRO = (99.125, 21.293, -15.633)
-TAMANHO = (20.0, 20.0, 20.0)
+CENTRO = (2.49, -24.48, 18.32)     # sitio do TcCYP51, medido do TPF
+TAMANHO = (22.0, 22.0, 22.0)
 EXHAUSTIVENESS = 8          # ajuste de producao
 SEED = 42
 
@@ -172,7 +172,7 @@ def gera_pdbqt(args):
 def prep():
     os.makedirs(LIGS, exist_ok=True)
     os.makedirs(DOCK, exist_ok=True)
-    ativos_todos = json.load(open(os.path.join(WORK, "ativos_cruzaina.json")))
+    ativos_todos = json.load(open(os.path.join(WORK, "ativos_alvo.json")))
 
     # amostra estratificada: metade dos mais potentes, metade espalhada
     ativos_todos.sort(key=lambda x: x["nM"])

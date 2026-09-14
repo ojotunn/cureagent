@@ -36,6 +36,10 @@
   .state .dot{display:inline-block;width:7px;height:7px;border-radius:50%;
     background:var(--warn);margin-right:7px;vertical-align:1px}
 
+  .ca{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:11px 0;border-top:1px solid var(--line2);font-family:var(--mono);font-size:12px}
+  .ca b{font-weight:520;color:var(--dim);text-transform:uppercase;letter-spacing:.09em;font-size:10px}
+  .ca a{color:var(--accent);text-decoration:none;word-break:break-all}
+  .ca a:hover{text-decoration:underline}
   nav{display:flex;gap:4px;overflow-x:auto;border-top:1px solid var(--line2)}
   nav button{
     appearance:none;background:none;border:0;border-bottom:2px solid transparent;
@@ -215,8 +219,15 @@
         <h1>Ehrlich</h1>
         <div class="motto">Open computational screening for neglected diseases. Every run published.</div>
       </div>
-      <div class="state"><span class="dot"></span><span id="estado">loading…</span></div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <a id="linkX" href="#" target="_blank" rel="noopener" hidden
+           style="font-family:var(--mono);font-size:12.5px;color:var(--accent);
+                  text-decoration:none;border:1px solid var(--line);border-radius:999px;
+                  padding:6px 13px;background:var(--card)"></a>
+        <div class="state"><span class="dot"></span><span id="estado">loading…</span></div>
+      </div>
     </div>
+    <div class="ca" id="barraCA" hidden></div>
     <nav role="tablist">
       <button role="tab" aria-selected="true"  data-tab="agent">The agent at work</button>
       <button role="tab" aria-selected="false" data-tab="results">Results</button>
@@ -268,6 +279,20 @@
           <h3>Status of this target</h3>
           <p class="note" id="rejeicao"></p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="secPorque" hidden>
+    <div class="split">
+      <div class="card">
+        <h3 id="porqueTit">Why this disease</h3>
+        <div id="porqueTxt"></div>
+        <p class="note" id="porqueFontes" style="margin-top:14px"></p>
+      </div>
+      <div class="card">
+        <h3 id="porqueAlvoTit">Why this protein</h3>
+        <div id="porqueAlvoTxt"></div>
       </div>
     </div>
   </section>
@@ -455,6 +480,22 @@
   <hr class="rule">
 
   <section>
+    <h2>One disease is not the point</h2>
+    <p class="lead">This is a process, not a single campaign. A target gets
+       validated, screened, published, and then the project moves to the next
+       disease on the list — carrying the same pipeline and the same rules.</p>
+    <p class="note">The first target, cruzain, was rejected here before a single
+       dollar of GPU was spent: the method could not tell a true crystal pose
+       from a wrong one in its shallow site. That result is published and stays
+       published. The second is CYP51, chosen by measuring candidates rather
+       than by picking the one that sounded best.</p>
+    <p class="note">Every campaign leaves behind a dataset that outlives it, and
+       the list of what to attack next is kept openly — below, on the roadmap.
+       A neglected disease is neglected precisely because no one keeps a
+       standing list and works through it.</p>
+  </section>
+
+  <section>
     <h2>Who picks it up from here</h2>
     <p class="note">Everything produced goes into the public domain immediately —
        scores, poses, the compounds tested, and the runs that failed. Open
@@ -484,6 +525,17 @@
        not a quote. Estimates are replaced by measurements as soon as the first
        real invoice exists.</p>
     <div class="ladder" id="roadmap" style="margin-top:18px"></div>
+  </section>
+
+  <section id="secFila" hidden>
+    <h2>The queue — diseases measured and waiting</h2>
+    <p class="note">Candidate targets across neglected diseases, each measured
+       for what actually decides whether work is possible: how many published
+       structures exist, and how many inhibitors have been measured in a
+       laboratory. A target with no measured inhibitors cannot be validated, so
+       it cannot be worked on honestly — that is a fact about the data, not an
+       opinion about the disease.</p>
+    <div class="tablewrap scroll" style="margin-top:14px"><table id="fila"></table></div>
   </section>
 
   <section>
@@ -532,6 +584,7 @@
        endorsement from, the Paul-Ehrlich-Institut, the Paul Ehrlich Foundation,
        or any body bearing his name.</p>
     <p id="recibo"></p>
+    <p id="rodapeX"></p>
   </div>
 </footer>
 
@@ -578,7 +631,8 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     [fmt(t.moleculas_triadas), "molecules docked", t.onde_rodou || ""],
     ["$" + (t.custo_gpu_usd ?? 0).toFixed(2), "spent on GPU", "everything so far ran on local CPU"],
     [enr.auc ? enr.auc.toFixed(3) : "—", "enrichment AUC", "0.50 = coin flip · 0.70 = useful"],
-    ["0", "tokens launched", "nothing is for sale yet"],
+    [fmt((alvo.pdb_validacao || []).length + (alvo.pdb_triagem ? 1 : 0)),
+     "crystal structures analysed", "every one checked for covalent ligands first"],
   ].map(([b, s, sm]) => `<div class="num"><b>${b}</b><span>${s}</span><small>${sm}</small></div>`).join("");
 
   const temAlvo = !!(alvo && alvo.nome);
@@ -681,6 +735,71 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
       <span>${esc(x.descricao)}</span>
       <em>${x.linhas ? fmt(x.linhas) + " rows · " : ""}download</em>
     </a>`).join("");
+
+  /* ---- contrato, so quando existir de verdade ---- */
+  fetch("token.json").then(r => r.json()).then(tk => {
+    if (tk && tk.x) {
+      const a = document.getElementById("linkX");
+      a.href = tk.x;
+      a.textContent = tk.x_handle || "X";
+      a.hidden = false;
+      document.getElementById("rodapeX").innerHTML =
+        `Updates: <a href="${esc(tk.x)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(tk.x_handle || tk.x)}</a>`;
+    }
+    if (!tk || !tk.contrato) return;         // sem contrato, sem barra
+    const b = document.getElementById("barraCA");
+    const partes = [`<b>${esc(tk.ticker || "token")}</b>`,
+      `<a href="${esc(tk.explorer + tk.contrato)}" target="_blank" rel="noopener">${esc(tk.contrato)}</a>`];
+    if (tk.pons && tk.contrato)
+      partes.push(`<a href="${esc(tk.pons + tk.contrato)}" target="_blank" rel="noopener">pons</a>`);
+    if (tk.carteira_fees)
+      partes.push(`<b>fees wallet</b><a href="${esc("https://robinhoodchain.blockscout.com/address/" + tk.carteira_fees)}" target="_blank" rel="noopener">${esc(tk.carteira_fees)}</a>`);
+    b.innerHTML = partes.join("");
+    b.hidden = false;
+  }).catch(() => {});
+
+  /* ---- por que esta doenca / esta proteina ---- */
+  if (alvo && (alvo.porque || alvo.porque_alvo)) {
+    document.getElementById("secPorque").hidden = false;
+    const q = alvo.porque, qa = alvo.porque_alvo;
+    if (q) {
+      document.getElementById("porqueTit").textContent = q.titulo || "Why this disease";
+      document.getElementById("porqueTxt").innerHTML =
+        (q.paragrafos || []).map((t, i) =>
+          `<p class="${i === 0 ? "lead" : "note"}">${esc(t)}</p>`).join("");
+      document.getElementById("porqueFontes").innerHTML = (q.fontes || []).length
+        ? "Sources: " + q.fontes.map(f =>
+            `<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.texto)}</a>`).join(" · ")
+        : "";
+    }
+    if (qa) {
+      document.getElementById("porqueAlvoTit").textContent = qa.titulo || "Why this protein";
+      document.getElementById("porqueAlvoTxt").innerHTML =
+        (qa.paragrafos || []).map((t, i) =>
+          `<p class="${i === 0 ? "lead" : "note"}">${esc(t)}</p>`).join("");
+    }
+  }
+
+  /* ---- a fila de alvos medidos ---- */
+  fetch("data/catalogo.json").then(r => r.json()).then(cat => {
+    const alvos = (cat.alvos || []).filter(a => a.doenca !== "[human counterpart]");
+    if (!alvos.length) return;
+    document.getElementById("secFila").hidden = false;
+    document.getElementById("fila").innerHTML =
+      `<thead><tr><th>disease</th><th>target</th><th>structures</th>
+        <th>measured inhibitors</th><th>site</th><th></th></tr></thead><tbody>` +
+      alvos.map(a => {
+        const viavel = (a.medidas >= 100 && a.pdb >= 10);
+        const atual = alvo && a.alvo && alvo.nome &&
+                      a.alvo.toLowerCase().includes(alvo.nome.toLowerCase());
+        return `<tr class="${atual ? "active" : ""}">
+          <td>${esc(a.doenca)}</td><td>${esc(a.alvo)}</td>
+          <td>${fmt(a.pdb)}</td><td>${fmt(a.medidas)}</td>
+          <td>${esc(a.sitio || "")}</td>
+          <td class="${viavel ? "pass" : "fail"}">${atual ? "current" : (viavel ? "workable" : "not enough data")}</td>
+        </tr>`;
+      }).join("") + `</tbody>`;
+  }).catch(() => {});
 
   const hist = d.historico || [];
   if (hist.length) {

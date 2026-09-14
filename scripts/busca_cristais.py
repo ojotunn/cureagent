@@ -32,11 +32,14 @@ def get(url, tipo="json"):
 
 
 def busca_pdbs():
+    import sys
+    termo = " ".join(sys.argv[1:]) or "cruzain cruzipain"
+    print(f"buscando: {termo}")
     consulta = {
         "query": {
             "type": "terminal",
             "service": "full_text",
-            "parameters": {"value": "cruzain cruzipain"},
+            "parameters": {"value": termo},
         },
         "return_type": "entry",
         "request_options": {"paginate": {"start": 0, "rows": 100}},

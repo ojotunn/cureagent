@@ -24,7 +24,7 @@ RDLogger.DisableLog("rdApp.*")
 BASE = r"C:\Higgsfield Games\keys"
 OUT = os.path.join(BASE, "results", "frente_a")
 API = "https://www.ebi.ac.uk/chembl/api/data"
-ALVO = "CHEMBL3563"
+ALVO = "CHEMBL1075110"   # TcCYP51 (era CHEMBL3563 = cruzaina)
 
 MAX_TORSOES = 10
 MAX_MW = 600.0
@@ -118,7 +118,7 @@ def main():
         print(f"  {r['chembl_id']:15s} {r['tipo']:5s} {r['nM']:9.1f} nM  "
               f"MW {r['mw']:6.1f}  tors {r['torsoes']:2d}  logP {r['logp']:5.2f}")
 
-    dest = os.path.join(OUT, "ativos_cruzaina.json")
+    dest = os.path.join(OUT, "ativos_alvo.json")
     with open(dest, "w") as fh:
         json.dump(linhas, fh, indent=1)
     print(f"\ngravado: {dest}")

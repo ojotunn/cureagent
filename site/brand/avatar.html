@@ -35,6 +35,31 @@
   body.v2 .sub{font-size:14px;letter-spacing:.3em;color:var(--accent);margin-top:8px;
     text-transform:uppercase;position:relative}
 
+  /* v4 — a proteina do site, cartoon verde sobre papel */
+  body.v4 .card{background:var(--paper);padding:0}
+  body.v4 .num, body.v4 .sub{display:none}
+  body.v4 #mol{width:400px;height:400px}
+
+  /* v5 — o heme em close: forma quadrada, ferro no centro, legivel pequeno */
+  body.v5 .card{background:var(--accent);padding:0}
+  body.v5 .num, body.v5 .sub{display:none}
+  body.v5 #mol{width:400px;height:400px}
+
+  /* v6 — a mesma proteina, sobre o verde da marca: contraste que sobrevive a 32px */
+  body.v6 .card{background:var(--accent);padding:0}
+  body.v6 .num, body.v6 .sub{display:none}
+  body.v6 #mol{width:400px;height:400px}
+
+  /* v7 — identico ao banner: papel, cartoon cinza, ligante laranja */
+  body.v7 .card{background:#fbfbfa;padding:0}
+  body.v7 .num, body.v7 .sub{display:none}
+  body.v7 #mol{width:400px;height:400px}
+  body.v7 .card{background-image:linear-gradient(#e8ebe9 1px,transparent 1px),
+                linear-gradient(90deg,#e8ebe9 1px,transparent 1px);
+                background-size:34px 34px}
+  body.v7 .six{position:absolute;bottom:26px;left:0;right:0;text-align:center;
+    font-family:var(--mono);font-size:13px;color:#767d84;letter-spacing:.16em}
+
   /* v3 — inicial, para quem prefere letra a numero */
   body.v3 .card{background:var(--accent);color:#fff}
   body.v3 .num{font-size:236px;font-weight:660;letter-spacing:-.06em;line-height:1}
@@ -45,11 +70,48 @@
 <div class="card">
   <div class="num" id="n">606</div>
   <div class="sub" id="s">Ehrlich</div>
+  <div id="mol" hidden></div>
+  <div class="six" id="six" hidden>COMPOUND 606 · 1909</div>
 </div>
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
 <script>
   const v = new URLSearchParams(location.search).get("v") || "1";
   document.body.className = "v" + v;
   if (v === "3") document.getElementById("n").textContent = "E";
+  if (v === "7") document.getElementById("six").hidden = false;
+
+  if (v === "4" || v === "5" || v === "6" || v === "7") {
+    const el = document.getElementById("mol");
+    el.hidden = false;
+    const fundo = (v === "4") ? "#ffffff" : (v === "7") ? "#fbfbfa" : "#0e7c6b";
+    const claro = (v === "6");
+    const view = $3Dmol.createViewer(el, {backgroundColor: fundo});
+    const arq = (v === "5") ? "../data/heme.pdb" : "../data/receptor.pdb";
+    fetch(arq).then(r => r.text()).then(txt => {
+      view.addModel(txt, "pdb");
+      if (v === "4" || v === "6" || v === "7") {
+        // mesmo cinza do site. O heme entra em laranja porque a 32px a forma
+        // da proteina some, mas um ponto de cor no meio ainda se enxerga.
+        view.setStyle({}, {cartoon: {color: claro ? "#e8edf1" : "#7d8a96", opacity: 0.96}});
+        fetch("../data/heme.pdb").then(r => r.text()).then(h => {
+          view.addModel(h, "pdb");
+          view.setStyle({model: 1}, {stick: {radius: 0.5, color: claro ? "#ffb056" : "#c2410c"}});
+          view.setStyle({model: 1, elem: "Fe"},
+                        {sphere: {radius: 1.7, color: claro ? "#ffb056" : "#c2410c"}});
+          view.zoomTo({model: 0});
+          view.zoom(1.5);
+          view.render();
+        });
+        view.zoomTo(); view.zoom(1.5);
+      } else {
+        view.setStyle({}, {stick: {radius: 0.45, color: "#ffffff"}, sphere: {radius: 0.28, color: "#ffffff"}});
+        view.setStyle({elem: "Fe"}, {sphere: {radius: 1.5, color: "#ffd166"}});
+        view.zoomTo(); view.zoom(1.35);
+        
+      }
+      view.render();
+    });
+  }
 </script>
 </body>
 </html>

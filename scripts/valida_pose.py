@@ -41,16 +41,24 @@ MK_LIG = os.path.join(SCRIPTS, "mk_prepare_ligand.exe")
 MK_EXP = os.path.join(SCRIPTS, "mk_export.exe")
 VINA = os.path.join(BASE, "tools", "vina.exe")
 
-FRAME = "1AIM"
-SITIO = np.array([99.125, 21.293, -15.633])   # centro do sitio catalitico
-CAIXA_PRODUCAO = (20.0, 20.0, 20.0)
+FRAME = "3KHM"          # receptor de triagem (TcCYP51 com TPF)
+LIG_FRAME_CODE = "TPF"  # ligante que define o sitio no frame
+SITIO = None            # calculado do ligante do frame, nao chutado
+CAIXA_PRODUCAO = (22.0, 22.0, 22.0)
+
+# COFATORES ficam NO RECEPTOR. O heme do CYP51 e parte do sitio ativo: docar
+# sem ele seria docar num buraco sem a peca central. Descobrir isso depois de
+# rodar custaria o dia.
+COFATORES = {"HEM", "HEC", "FAD", "FMN", "NAP", "NAD", "ZN", "MG", "MN", "FE"}
 PADDING = 5.0
 EXHAUSTIVENESS = 32      # redocking: busca generosa
 EXH_PRODUCAO = 8         # cross-docking: ajuste de producao
 SEED = 42
 
-CASOS = [("4W5C", "3H7"), ("4W5B", "3H5"), ("4W5C", "3H6"),
-         ("4KLB", "1RV"), ("3KKU", "B95"), ("1U9Q", "186")]
+CASOS = [("4H6O", "NEE"), ("3ZG3", "UDD"), ("3ZG2", "UDO"), ("2WUZ", "TPF"),
+         ("3KHM", "TPF"), ("2WX2", "TPF"), ("2W0A", "CII"), ("6FMO", "DVE"),
+         ("3KSW", "VNF"), ("4CKA", "LFS"), ("4CK9", "LFT"), ("2W09", "CM9"),
+         ("4BJK", "18I"), ("5AJR", "VT1")]
 
 
 def log(m):
@@ -88,7 +96,7 @@ def alinha(pdb_id, lig_code=None):
     destino = os.path.join(POSE, f"{pdb_id}_{lig_code or 'x'}_frame.pdb")
     st_mov = gemmi.read_structure(baixa(pdb_id))
     st_mov.setup_entities()
-    if pdb_id == FRAME and lig_code in (None, "ZYA"):
+    if pdb_id == FRAME and lig_code in (None, LIG_FRAME_CODE):
         st_mov.write_pdb(destino)
         return destino, 0.0, "A"
 
@@ -141,7 +149,7 @@ def separa(pdb_path, pdb_id, lig_code):
             break
     if cadeia is None:
         return None, None
-    rec, lig = [], []
+    rec, lig, cof = [], [], []
     for ln in linhas:
         if not ln.startswith(("ATOM", "HETATM")):
             continue
@@ -149,9 +157,12 @@ def separa(pdb_path, pdb_id, lig_code):
             continue
         if ln[76:78].strip() == "H":
             continue
+        resn = ln[17:20].strip()
         if ln.startswith("ATOM") and ln[21] == cadeia:
             rec.append(ln)
-        elif (ln.startswith("HETATM") and ln[17:20].strip() == lig_code
+        elif ln.startswith("HETATM") and resn in COFATORES and ln[21] == cadeia:
+            cof.append(ln)          # cofator vai separado: o Meeko nao o digere
+        elif (ln.startswith("HETATM") and resn == lig_code
               and ln[21] == cadeia):
             lig.append(ln)
     if not lig:
@@ -159,6 +170,9 @@ def separa(pdb_path, pdb_id, lig_code):
     tag = f"{pdb_id}_{lig_code}"
     rec_p = os.path.join(POSE, f"{tag}_rec.pdb")
     lig_p = os.path.join(POSE, f"{tag}_lig.pdb")
+    cof_p = os.path.join(POSE, f"{tag}_cof.pdb")
+    with open(cof_p, "w") as fh:
+        fh.writelines(cof)
     with open(rec_p, "w") as fh:
         fh.writelines(rec), fh.write("END\n")
     with open(lig_p, "w") as fh:
@@ -197,6 +211,43 @@ def ligante_sdf(tag, lig_code, lig_pdb):
     return sdf, ref
 
 
+
+# tipo de atomo AutoDock por elemento. O Vina pontua por TIPO e distancia — nao
+# usa carga parcial — entao anexar cofator com carga 0 e valido.
+TIPO_AD = {"C": "C", "N": "NA", "O": "OA", "S": "SA", "FE": "Fe", "ZN": "Zn",
+           "MG": "Mg", "MN": "Mn", "P": "P", "F": "F", "CL": "Cl", "BR": "Br"}
+
+
+def anexa_cofatores(pdbqt, rec_pdb):
+    cof_pdb = rec_pdb.replace("_rec.pdb", "_cof.pdb")
+    if os.path.exists(cof_pdb):
+        rec_pdb = cof_pdb
+    """Poe os cofatores no PDBQT do receptor.
+
+    O Meeko nao monta template para HEM e simplesmente o descarta. Um CYP51 sem
+    o heme e um sitio sem a peca do meio: tudo que fosse docado ali estaria
+    errado, e o erro seria silencioso.
+    """
+    linhas, n = [], 0
+    for ln in open(rec_pdb):
+        if not ln.startswith("HETATM"):
+            continue
+        if ln[17:20].strip() not in COFATORES:
+            continue
+        el = (ln[76:78].strip() or ln[12:14].strip()).upper()
+        tipo = TIPO_AD.get(el)
+        if tipo is None:
+            continue
+        linhas.append(f"{ln[:54]}  1.00  0.00     0.000 {tipo:<2}\n")
+        n += 1
+    if not n:
+        return 0
+    with open(pdbqt) as fh:
+        atual = fh.read()
+    with open(pdbqt, "w") as fh:
+        fh.write(atual.rstrip("\n") + "\n" + "".join(linhas))
+    return n
+
 def prep_receptor(tag, rec_pdb, centro, tamanho):
     base = os.path.join(POSE, f"{tag}_rec")
     ok, _ = roda([MK_REC, "--read_pdb", rec_pdb, "-o", base, "-p",
@@ -215,6 +266,9 @@ def prep_receptor(tag, rec_pdb, centro, tamanho):
         return None
     for suf in (".pdbqt", "_rigid.pdbqt"):
         if os.path.exists(base + suf):
+            n = anexa_cofatores(base + suf, rec_pdb)
+            if n:
+                log(f"    cofator anexado ao receptor: {n} atomos")
             return base + suf
     return None
 
@@ -264,6 +318,14 @@ def main():
     os.makedirs(POSE, exist_ok=True)
     rec_frame_pdbqt = None
     resultados = []
+
+    # o centro do sitio sai do ligante do frame, medido, nunca chutado
+    global SITIO
+    al_frame, _, _ = alinha(FRAME, LIG_FRAME_CODE)
+    _, lig_frame_pdb = separa(al_frame, FRAME, LIG_FRAME_CODE)
+    SITIO = xyz(lig_frame_pdb).mean(axis=0)
+    log(f"sitio do {FRAME}/{LIG_FRAME_CODE}: "
+        f"({SITIO[0]:.2f}, {SITIO[1]:.2f}, {SITIO[2]:.2f})")
 
     log("=" * 74)
     log("PREPARACAO E CONFERENCIA DE SITIO")

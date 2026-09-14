@@ -1,0 +1,34 @@
+doenca                 alvo                                 PDB  medidas  sitio
+------------------------------------------------------------------------------------------------
+*Chagas disease        TcCYP51                               27      603  deep, heme
+*Chagas disease        Cruzain                               31     1443  shallow cleft (REJECTED)
+*Chagas disease        TcTR (trypanothione reductase)        13      489  wide
+ Chagas disease        TcGAPDH                                9       58  cofactor pocket
+*Leishmaniasis         LdTR                                  17      199  wide
+*Leishmaniasis         LmPTR1                                45      186  folate pocket
+ Leishmaniasis         Ld arginase                            8       65  metal
+*Sleeping sickness     TbPTR1                               102      152  folate pocket
+*Sleeping sickness     Rhodesain                             13      594  shallow cleft
+ Sleeping sickness     TbGAPDH                                3        4  cofactor pocket
+*Schistosomiasis       SmHDAC8                               30      260  deep, zinc
+ Schistosomiasis       SmTGR                                 81       59  flavin
+*Schistosomiasis       SmGST                                 61      111  medium
+ Schistosomiasis       SmDHODH                               21       32  deep
+*Malaria               PfDHFR                                70     1120  folate pocket
+*Malaria               PfDHODH                              102      637  deep
+*Malaria               Plasmepsin II                         59      721  aspartic protease
+*Malaria               Falcipain-2                           12      613  shallow cleft
+*Tuberculosis          InhA                                 133      574  deep, NADH
+*Tuberculosis          DprE1                                 34      159  deep, flavin
+ Toxoplasmosis         TgCDPK1                               53        0  kinase pocket
+ Onchocerciasis        Ov chitinase                           0       48  tunnel
+ Lymphatic filariasis  Bm asparaginyl-tRNA synthetase        10        0  deep
+ Mycetoma              Mm CYP51                               0        0  deep, heme
+ Amoebiasis            Eh alcohol dehydrogenase              17        0  metal
+*[human counterpart]   Human CYP51                           17      223  deep, heme
+*[human counterpart]   Human HDAC8                           54     5138  deep, zinc
+*[human counterpart]   Human DHFR                          1643     2102  folate pocket
+*[human counterpart]   Cathepsin L                          983     4473  shallow cleft
+
+29 alvos medidos · 19 trabalhaveis (>=100 medidas e >=10 estruturas)
+gravado em C:\Higgsfield Games\keys\results\catalogo

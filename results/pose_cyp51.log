@@ -1,0 +1,141 @@
+sitio do 3KHM/TPF: (2.49, -24.48, 18.32)
+==========================================================================
+PREPARACAO E CONFERENCIA DE SITIO
+==========================================================================
+
+4H6O_NEE
+  superposto pela cadeia A (a do ligante): Ca RMSD 0.95 A
+  ligante a 3.4 A do centro do sitio catalitico
+    cofator anexado ao receptor: 43 atomos
+  pronto (caixa nativa [19.8 18.  14.9])
+
+3ZG3_UDD
+  superposto pela cadeia A (a do ligante): Ca RMSD 0.94 A
+  ligante a 1.5 A do centro do sitio catalitico
+    cofator anexado ao receptor: 43 atomos
+  pronto (caixa nativa [18.  24.5 17.7])
+
+3ZG2_UDO
+  superposto pela cadeia A (a do ligante): Ca RMSD 1.09 A
+  ligante a 2.6 A do centro do sitio catalitico
+    cofator anexado ao receptor: 43 atomos
+  pronto (caixa nativa [17.3 25.3 17. ])
+
+2WUZ_TPF
+  superposto pela cadeia A (a do ligante): Ca RMSD 1.32 A
+  ligante a 0.9 A do centro do sitio catalitico
+    [FALHOU] receptor 2WUZ_TPF
+      LYS        heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess=set()
+      NLYS       heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess={4}
+      CLYS       heavy_miss=5 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess=set()
+      LYN        heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess=set()
+      NLYN       heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess={4}
+      CLYN       heavy_miss=5 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess=set()
+
+3KHM_TPF
+  superposto pela cadeia A (a do ligante): Ca RMSD 0.00 A
+  ligante a 0.0 A do centro do sitio catalitico
+    cofator anexado ao receptor: 43 atomos
+  pronto (caixa nativa [16.8 18.2 14.8])
+
+2WX2_TPF
+  superposto pela cadeia A (a do ligante): Ca RMSD 1.69 A
+  ligante a 0.3 A do centro do sitio catalitico
+    [FALHOU] receptor 2WX2_TPF
+      LYS        heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess=set()
+      NLYS       heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess={4}
+      CLYS       heavy_miss=5 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess=set()
+      LYN        heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess=set()
+      NLYN       heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess={4}
+      CLYN       heavy_miss=5 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess=set()
+
+2W0A_CII
+  superposto pela cadeia A (a do ligante): Ca RMSD 4.99 A
+  ligante a 1.7 A do centro do sitio catalitico
+    [FALHOU] receptor 2W0A_CII
+      matched with excess inter-residue bond(s): A:391
+      No template matched for residue_key='A:450'
+      tried 3 templates for residue_key='A:450'excess_H_ok=False
+      GLY        heavy_miss=3 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess=set()
+      NGLY       heavy_miss=3 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess={4}
+      CGLY       heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess=set()
+
+6FMO_DVE
+  superposto pela cadeia B (a do ligante): Ca RMSD 2.35 A
+  ligante a 44.3 A do centro do sitio catalitico
+  >>> FORA do sitio catalitico. Descartado (nao valida a triagem).
+
+3KSW_VNF
+  superposto pela cadeia A (a do ligante): Ca RMSD 1.60 A
+  ligante a 2.1 A do centro do sitio catalitico
+    [FALHOU] receptor 3KSW_VNF
+      CGLU       heavy_miss=5 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess={1}
+      GLH        heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess=set()
+      NGLH       heavy_miss=4 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess={4}
+      CGLH       heavy_miss=5 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess={1}
+      
+      matched with excess inter-residue bond(s): A:251
+
+4CKA_LFS
+  superposto pela cadeia A (a do ligante): Ca RMSD 0.89 A
+  ligante a 2.5 A do centro do sitio catalitico
+    cofator anexado ao receptor: 43 atomos
+  pronto (caixa nativa [19.7 20.8 17.3])
+
+4CK9_LFT
+  superposto pela cadeia A (a do ligante): Ca RMSD 0.93 A
+  ligante a 2.2 A do centro do sitio catalitico
+    cofator anexado ao receptor: 43 atomos
+  pronto (caixa nativa [18.6 21.7 18. ])
+
+2W09_CM9
+  superposto pela cadeia A (a do ligante): Ca RMSD 4.13 A
+  ligante a 1.4 A do centro do sitio catalitico
+    [FALHOU] receptor 2W09_CM9
+      matched with excess inter-residue bond(s): A:102
+      No template matched for residue_key='A:449'
+      tried 3 templates for residue_key='A:449'excess_H_ok=False
+      THR        heavy_miss=2 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess=set()
+      NTHR       heavy_miss=2 heavy_excess=0 H_excess=[] bond_miss={0} bond_excess={4}
+      CTHR       heavy_miss=3 heavy_excess=0 H_excess=[] bond_miss=set() bond_excess=set()
+
+4BJK_18I
+  superposto pela cadeia B (a do ligante): Ca RMSD 1.34 A
+  ligante a 41.9 A do centro do sitio catalitico
+  >>> FORA do sitio catalitico. Descartado (nao valida a triagem).
+
+5AJR_VT1
+  superposto pela cadeia A (a do ligante): Ca RMSD 1.22 A
+  ligante a 3.4 A do centro do sitio catalitico
+    cofator anexado ao receptor: 43 atomos
+  pronto (caixa nativa [16.1 26.9 17.1])
+
+3KHM (receptor de triagem)
+
+==========================================================================
+TESTE 1 — REDOCKING no proprio cristal
+==========================================================================
+  4H6O_NEE       -9.71 kcal/mol  pose1 =  1.21 A  melhor =  1.21 A
+  3ZG3_UDD      -11.50 kcal/mol  pose1 =  0.99 A  melhor =  0.99 A
+  3ZG2_UDO      -11.23 kcal/mol  pose1 =  0.86 A  melhor =  0.86 A
+  3KHM_TPF       -7.91 kcal/mol  pose1 =  2.60 A  melhor =  2.34 A
+  4CKA_LFS      -10.16 kcal/mol  pose1 =  4.08 A  melhor =  1.14 A
+  4CK9_LFT       -9.89 kcal/mol  pose1 =  3.68 A  melhor =  1.82 A
+  5AJR_VT1      -10.69 kcal/mol  pose1 = 10.93 A  melhor =  1.72 A
+
+==========================================================================
+TESTE 2 — CROSS-DOCKING no 3KHM, caixa e exhaustiveness de PRODUCAO
+==========================================================================
+
+==========================================================================
+VEREDICTO
+==========================================================================
+REDOCK  4H6O_NEE     aff=  -9.71  pose1= 1.21  melhor= 1.21  -> PASSOU
+REDOCK  3ZG3_UDD     aff= -11.50  pose1= 0.99  melhor= 0.99  -> PASSOU
+REDOCK  3ZG2_UDO     aff= -11.23  pose1= 0.86  melhor= 0.86  -> PASSOU
+REDOCK  3KHM_TPF     aff=  -7.91  pose1= 2.60  melhor= 2.34  -> FALHOU
+REDOCK  4CKA_LFS     aff= -10.16  pose1= 4.08  melhor= 1.14  -> recuperada
+REDOCK  4CK9_LFT     aff=  -9.89  pose1= 3.68  melhor= 1.82  -> recuperada
+REDOCK  5AJR_VT1     aff= -10.69  pose1=10.93  melhor= 1.72  -> recuperada
+
+REDOCK: 3/7 com pose 1 dentro de 2,0 A
