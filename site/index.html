@@ -75,6 +75,27 @@
   #viewer .fallback{position:absolute;inset:0;display:flex;align-items:center;
     justify-content:center;color:var(--dim);font-family:var(--mono);font-size:12.5px;
     text-align:center;padding:24px}
+  /* ---------- molecula da vez, sobre o viewer ---------- */
+  .viewport{position:relative}
+  .np{position:absolute;left:16px;top:16px;right:16px;display:flex;gap:14px;
+    align-items:flex-start;justify-content:space-between;pointer-events:none}
+  .np-box{background:rgba(255,255,255,.92);border:1px solid var(--line);
+    border-radius:10px;padding:11px 14px;backdrop-filter:blur(3px);min-width:190px}
+  .np-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--warn);margin-bottom:7px}
+  .np-tag.live{color:var(--pass)}
+  .np-id{font-family:var(--mono);font-size:14px;font-weight:620;letter-spacing:-.01em}
+  .np-score{font-family:var(--mono);font-size:22px;font-weight:620;
+    letter-spacing:-.02em;margin-top:3px}
+  .np-class{font-size:11.5px;color:var(--dim);margin-top:3px}
+  .np-class.act{color:var(--accent);font-weight:560}
+  .np-right{text-align:right}
+  .np-count{font-family:var(--mono);font-size:11px;color:var(--dim)}
+  .np-bar{width:130px;height:3px;background:var(--line);border-radius:2px;
+    margin-top:7px;overflow:hidden;margin-left:auto}
+  .np-bar i{display:block;height:100%;background:var(--accent);width:0}
+  #viewer.playing{cursor:pointer}
+
   .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12px;
     color:var(--dim);font-family:var(--mono)}
   .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;
@@ -219,11 +240,26 @@
     <h2>The target on the bench</h2>
     <div class="split">
       <div>
+        <div class="viewport">
         <div id="viewer"><div class="fallback">loading structure…</div></div>
+          <div class="np" hidden id="np">
+            <div class="np-box">
+              <div class="np-tag" id="npTag">replay · run of 2026-09-14</div>
+              <div class="np-id" id="npId">—</div>
+              <div class="np-score" id="npScore">—</div>
+              <div class="np-class" id="npClass">—</div>
+            </div>
+            <div class="np-right">
+              <div class="np-count" id="npCount">—</div>
+              <div class="np-bar"><i id="npBar"></i></div>
+            </div>
+          </div>
+        </div>
         <div class="legend">
           <span><i style="background:#7d8a96"></i>protein backbone</span>
           <span><i style="background:#0e7c6b"></i>residues lining the site</span>
-          <span><i style="background:#c2410c"></i>reference ligand</span>
+          <span><i style="background:#c2410c"></i>molecule being tested</span>
+          <span id="dica"></span>
         </div>
       </div>
       <div>
@@ -667,17 +703,84 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
       view.addStyle({model: 0, within: {distance: 8, sel: {model: 1}}},
                     {stick: {radius: 0.12, color: "#0e7c6b"}});
     }
-    view.zoomTo({model: 0});
-    view.zoom(1.15);
+    // enquadra o SITIO, nao a proteina inteira: e ali que o trabalho acontece
+    view.zoomTo(temLig ? {model: 1} : {model: 0});
+    view.zoom(temLig ? 0.30 : 1.15);
+    // o ligante de referencia ja serviu (definiu sitio e camera); sai de cena
+    // para nao ser confundido com a molecula que esta sendo testada
+    if (temLig) view.setStyle({model: 1}, {});
     view.render();
-    view.spin("y", 0.3);
+    view.spin("y", 0.18);
+
     setTimeout(() => {
       const cv = el.querySelector("canvas");
       if (!cv || cv.width < 10) el.insertAdjacentHTML("beforeend",
         `<div class="fallback">WebGL unavailable in this browser — the measured
          numbers below are unaffected.</div>`);
     }, 1500);
+
+    tocaPoses(view, temLig ? 2 : 1);
   }).catch(e => { el.innerHTML = `<div class="fallback">structure failed to load — ${e}</div>`; });
+
+/* ---------------- replay das poses reais ----------------
+   Nada aqui e animacao inventada: cada conjunto de coordenadas veio do
+   arquivo de saida do docking daquela molecula. A tela reproduz o run. */
+function tocaPoses(view, indiceModelo) {
+  const np = document.getElementById("np");
+  const elVis = document.getElementById("viewer");
+  fetch("data/poses.json").then(r => r.json()).then(d => {
+    const poses = d.poses || [];
+    if (!poses.length) return;
+
+    document.getElementById("npTag").textContent =
+      `replay · run of ${d.run}`;
+    document.getElementById("dica").textContent = "click to pause";
+    np.hidden = false;
+    elVis.classList.add("playing");
+
+    let i = 0, modelo = null, rodando = true, timer = null;
+
+    function mostra(p) {
+      // bloco XYZ: o 3Dmol infere as ligacoes pelas distancias
+      const els = p.el.split(",");
+      let txt = els.length + "\n\n";
+      for (let k = 0; k < els.length; k++) {
+        txt += `${els[k]} ${p.xyz[k*3]} ${p.xyz[k*3+1]} ${p.xyz[k*3+2]}\n`;
+      }
+      if (modelo !== null) view.removeModel(modelo);
+      modelo = view.addModel(txt, "xyz");
+      view.setStyle({model: modelo},
+                    {stick: {radius: 0.17, colorscheme: "orangeCarbon"}});
+      view.render();
+
+      document.getElementById("npId").textContent = p.id;
+      document.getElementById("npScore").textContent =
+        p.s.toFixed(2) + " kcal/mol";
+      const cls = document.getElementById("npClass");
+      cls.textContent = p.a
+        ? `known inhibitor${p.nM ? " · " + p.nM + " nM" : ""}`
+        : "decoy";
+      cls.className = "np-class" + (p.a ? " act" : "");
+      document.getElementById("npCount").textContent =
+        `${i + 1} / ${poses.length}`;
+      document.getElementById("npBar").style.width =
+        (100 * (i + 1) / poses.length).toFixed(1) + "%";
+    }
+
+    function passo() {
+      mostra(poses[i]);
+      i = (i + 1) % poses.length;
+      timer = setTimeout(passo, 2600);
+    }
+    passo();
+
+    elVis.addEventListener("click", () => {
+      rodando = !rodando;
+      if (rodando) { passo(); document.getElementById("dica").textContent = "click to pause"; }
+      else { clearTimeout(timer); document.getElementById("dica").textContent = "paused · click to resume"; }
+    });
+  }).catch(() => { /* sem poses, a tela fica so com a proteina */ });
+}
 
 }).catch(e => {
   document.body.insertAdjacentHTML("afterbegin",
