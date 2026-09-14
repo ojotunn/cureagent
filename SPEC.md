@@ -101,9 +101,25 @@ ativo principal do projeto — vale mais que a narrativa.
 Os dois últimos aparecem no site com valor acumulado. Nada de airdrop, prêmio,
 sorteio ou distribuição a holders — decisão do Michel.
 
-**A carteira do agente é NOSSA**, não a do claudeploy. O creatorFeeRecipient
-aponta para ela. Não usamos attach_agent: aquele agente sabe fazer buyback e
-airdrop, não sabe fazer docking.
+**DECISÃO 14/09/2026 — o agente NÃO tem carteira.**
+
+O Michel coleta as fees na pons e credita a conta de compute manualmente. O
+`creatorFeeRecipient` aponta para a carteira dele. Não usamos attach_agent.
+
+O que isso resolve: o bloqueio nº 2 (como o agente pagaria a RunPod em ETH)
+deixa de existir. Sem chave privada em servidor, sem custódia, sem travas de
+carteira para construir e auditar.
+
+O que o agente continua fazendo: **ler a chain é público**. Ele observa as
+compras na curva sem carteira nenhuma e dispara o lote de moléculas no nome do
+endereço que comprou. A mecânica central — cada compra vira um lote com o nome
+de quem pagou — fica intacta.
+
+O preço: o site não prova sozinho que X de fee virou Y de placa. Isso se
+resolve declarando na página, não escondendo:
+*"fees are collected by the creator and credited to the compute account
+manually; every purchase of GPU time is published here with its date and
+amount."* Recibo publicado vale mais que automação fingida.
 
 **Travas da carteira** (padrão Yuna): não transfere para endereço arbitrário, só
 para os dois destinos fixos (cofre e criador). Teto diário de gasto com Claude
@@ -244,10 +260,8 @@ com ponto de desistência entre as fatias:
 1. **RunPod não autorizado.** O plugin está instalado, o OAuth não foi feito, e
    sessão não-interativa não abre esse fluxo. Sem isso não há medição. É o
    bloqueio numero 1.
-2. **Como o agente paga a RunPod.** As fees chegam em ETH na Robinhood Chain; a
-   RunPod cobra em cartão/crédito. Até confirmarmos se ela aceita cripto, o
-   pagamento é **manual** (Michel converte e credita) e o site diz isso na cara.
-   Não inventar automação que não existe.
+2. ~~Como o agente paga a RunPod.~~ **RESOLVIDO em 14/09:** o Michel coleta as
+   fees e credita a conta de compute. O agente não toca em dinheiro. Ver seção 3.
 3. **Licença ZINC.** Uso é livre; redistribuir subconjunto grande exige permissão
    escrita. Nosso plano publica resultados, não a biblioteca — ler os termos na
    fonte e registrar a leitura antes da primeira linha de código. (Lição do
