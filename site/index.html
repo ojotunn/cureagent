@@ -112,7 +112,22 @@
   .rung.locked{opacity:.58}
   .rung.theirs{background:var(--paper);border-style:dashed}
   .rung h4{margin:0;font-size:14.5px;font-weight:580}
-  .rung p{margin:2px 0 0;font-size:12.5px;color:var(--dim)}
+  .rung p{margin:4px 0 0;font-size:12.5px;color:var(--dim);max-width:62ch}
+  .rung .custo{font-family:var(--mono);font-size:14px;font-weight:620;
+    display:block;margin-bottom:4px;white-space:nowrap}
+  .conf{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;
+    letter-spacing:.07em;padding:2px 7px;border-radius:999px;border:1px solid var(--line);
+    white-space:nowrap}
+  .conf.measured{background:#eefaf1;color:var(--pass);border-color:#cfe7d8}
+  .conf.estimated{background:#fdf4e7;color:var(--warn);border-color:#f0dfc0}
+  .conf.unquoted{background:var(--paper);color:var(--dim)}
+  .totalbox{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px;margin-top:16px;display:flex;flex-wrap:wrap;gap:20px;
+    align-items:baseline;justify-content:space-between}
+  .totalbox b{font-family:var(--mono);font-size:clamp(20px,3vw,26px);font-weight:620}
+  .totalbox span{display:block;font-size:11px;color:var(--dim);
+    text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px}
+  .totalbox p{margin:0;max-width:56ch;color:var(--dim);font-size:13.5px}
 
   ol.steps{counter-reset:s;list-style:none;padding:0;margin:0}
   ol.steps li{counter-increment:s;position:relative;padding-left:44px;margin-bottom:20px}
@@ -401,8 +416,13 @@
     <h2>Roadmap — each step priced, each step a receipt</h2>
     <p class="note">Costs are what the project will <strong>spend</strong>. A step
        unlocks when its cost is covered, and when it is paid the receipt is
-       published here with the date. Prices that have not been confirmed with a
-       supplier or a laboratory are shown as not priced rather than guessed.</p>
+       published here with the date. Every figure says where it came from:
+       <span class="conf measured">measured</span> is what was actually spent,
+       <span class="conf estimated">estimated</span> is derived from a public
+       rental price, and <span class="conf unquoted">unquoted</span> means no
+       supplier or laboratory has given us a price yet — an order of magnitude,
+       not a quote. Estimates are replaced by measurements as soon as the first
+       real invoice exists.</p>
     <div class="ladder" id="roadmap" style="margin-top:18px"></div>
   </section>
 
@@ -583,9 +603,22 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
 
   $("#roadmap").innerHTML = (d.roadmap || []).map(s => `
     <div class="rung ${s.estado}"><em>${s.fase}</em>
-      <div><h4>${s.nome}</h4></div>
-      <div class="st">${s.custo_usd === 0 ? "$0" : (s.custo_usd === null ? "not priced" : "$" + fmt(s.custo_usd))} · ${s.estado}</div>
+      <div>
+        <h4>${esc(s.nome)}</h4>
+        ${s.base ? `<p>${esc(s.base)}</p>` : ""}
+      </div>
+      <div class="st">
+        <b class="custo">${esc(s.custo ?? "—")}</b>
+        <span class="conf ${esc(s.confianca || "")}">${esc(s.confianca || "")}</span>
+      </div>
     </div>`).join("");
+
+  const tot = d.roadmap_total;
+  if (tot) $("#roadmap").insertAdjacentHTML("afterend", `
+    <div class="totalbox">
+      <div><span>everything up to a laboratory bench</span><b>${esc(tot.ate_bancada)}</b></div>
+      <p>${esc(tot.nota)}</p>
+    </div>`);
 
   $("#recibo").textContent =
     `Receipt: ${fmt(t.moleculas_triadas)} dockings, ${t.minutos} minutes on ${t.onde_rodou}, $${(t.custo_gpu_usd ?? 0).toFixed(2)} of rented compute. Page generated ${d.gerado_em}.`;

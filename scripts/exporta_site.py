@@ -237,22 +237,54 @@ def main():
             "veredicto": ("Target rejected by the criterion set before the test. "
                           "Pipeline itself validated."),
         },
+        # Cada custo carrega DE ONDE veio e o quanto se pode confiar nele:
+        #   measured  = ja aconteceu, o valor e o que foi gasto
+        #   estimated = derivado de preco publico de aluguel de placa
+        #   unquoted  = ninguem nos deu preco ainda; a faixa e ordem de grandeza
         "roadmap": [
             {"fase": 0, "nome": "Pipeline built and validated",
-             "custo_usd": 0, "estado": "done"},
-            {"fase": 1, "nome": "Target validation (enrichment + pose)",
-             "custo_usd": 0, "estado": "done"},
-            {"fase": 2, "nome": "Fair decoys + alternative target",
-             "custo_usd": 0, "estado": "next"},
+             "custo": "$0", "confianca": "measured",
+             "base": "ran on a local CPU, nothing rented",
+             "estado": "done"},
+            {"fase": 1, "nome": "Target validation — enrichment and pose",
+             "custo": "$0", "confianca": "measured",
+             "base": "639 dockings, 61 minutes on 16 local cores",
+             "estado": "done"},
+            {"fase": 2, "nome": "Fair decoys, and a second target evaluated",
+             "custo": "$0", "confianca": "estimated",
+             "base": "a few hours of the same local CPU",
+             "estado": "next"},
             {"fase": 3, "nome": "1 million molecules screened",
-             "custo_usd": None, "estado": "locked"},
-            {"fase": 4, "nome": "Beat the largest published screen",
-             "custo_usd": None, "estado": "locked"},
+             "custo": "$10 – 50", "confianca": "estimated",
+             "base": "GPU rental at $0.34/hour; 0.1–0.3 s per molecule, "
+                     "derived from published Vina-GPU speedups. The first hour "
+                     "of rented GPU replaces this with a measured number.",
+             "estado": "locked"},
+            {"fase": 4, "nome": "Beat the largest published screen on this target",
+             "custo": "$30 – 120", "confianca": "estimated",
+             "base": "same basis, about four times the molecules",
+             "estado": "locked"},
             {"fase": 5, "nome": "Buy the 20 best compounds",
-             "custo_usd": None, "estado": "locked"},
-            {"fase": 6, "nome": "Enzyme assay in a real lab",
-             "custo_usd": None, "estado": "locked"},
+             "custo": "$1,000 – 3,000", "confianca": "unquoted",
+             "base": "made-to-order synthesis, roughly three weeks. No supplier "
+                     "has quoted us yet — this is an order of magnitude, not a price.",
+             "estado": "locked"},
+            {"fase": 6, "nome": "Enzyme assay in a real laboratory",
+             "custo": "$2,000 – 8,000", "confianca": "unquoted",
+             "base": "does the molecule actually block the protein? Needs a "
+                     "laboratory to quote it; a conversation, not a web search.",
+             "estado": "locked"},
+            {"fase": 7, "nome": "Cell assay — parasite killed, human cells spared",
+             "custo": "$5,000 – 15,000", "confianca": "unquoted",
+             "base": "the last rung this project can reach on its own",
+             "estado": "locked"},
         ],
+        "roadmap_total": {
+            "ate_bancada": "$3,000 – 11,000",
+            "nota": "Everything from an empty screen to a result on a real "
+                    "laboratory bench. The computing is the cheap part — it is "
+                    "the glassware that costs.",
+        },
     }
 
     with open(os.path.join(DADOS, "dados.json"), "w") as fh:
