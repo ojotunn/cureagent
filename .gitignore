@@ -30,3 +30,4 @@ __pycache__/
 
 # campanhas arquivadas pelo reset.py: pesadas e reproduziveis
 results/arquivo/
+.segredo_motor
