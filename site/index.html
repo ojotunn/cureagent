@@ -286,12 +286,12 @@
 <div id="tab-agent" role="tabpanel">
 
   <section>
-    <h2>Work done so far</h2>
+    <h2 id="tituloFeito">Work done so far</h2>
     <div class="nums" id="nums"></div>
   </section>
 
   <section>
-    <h2>The target on the bench</h2>
+    <h2 id="tituloAlvo">The target on the bench</h2>
     <div class="split">
       <div>
         <div class="viewport">
@@ -709,6 +709,15 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     <div class="kv"><span>largest published screen</span><b>${fmt(alvo.recorde_publicado)}</b></div>`;
   $("#rejeicao").textContent = alvo.estado_nota || "";
 
+  // Este bloco e o REGISTRO PUBLICADO, nao o que a placa faz agora. Enquanto o
+  // alvo do registro estiver reprovado, dizer "na bancada" aqui e mentira: a
+  // bancada esta no cabecalho e no painel do motor, alimentados pela placa.
+  if (alvo.estado === "rejected") {
+    const tf = $("#tituloFeito"), ta = $("#tituloAlvo");
+    if (tf) tf.textContent = "Published campaign: " + (alvo.nome || "previous target");
+    if (ta) ta.textContent = "The published record — this target was rejected";
+  }
+
   const ctrl = v.controle_positivo || [];
   $("#controle").innerHTML = ctrl.length
     ? ctrl.map(c => `<div class="kv"><span>${c.caso.replace("_"," / ")} · ${c.torsoes} rot. bonds</span>
@@ -875,16 +884,21 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
               ? [[fmt(mt.docadas || 0), "molecules docked"],
                  [mt.auc != null ? mt.auc.toFixed(3) : "—", "AUC-ROC · needs ≥ 0.70"],
                  [mt.alvo || "—", "target on the bench"],
-                 [mt.gpu || "—", "rented hardware"]]
+                 [mt.gpu_gasto_usd != null ? "$" + mt.gpu_gasto_usd.toFixed(2) : "—",
+                  "GPU spent on this run"]]
               : [[fmt(mt.triadas || 0), "molecules screened"],
                  [(mt.por_hora ? fmt(mt.por_hora) : "—"), "per hour"],
                  [mt.receptor || "—", "target on the bench"],
-                 [mt.gpu || "—", "rented hardware"]];
+                 [mt.gpu_gasto_usd != null ? "$" + mt.gpu_gasto_usd.toFixed(2) : "—",
+                  "GPU spent on this run"]];
             cx.innerHTML = campos.map(([b, t]) =>
               `<div><b>${esc(String(b))}</b><span>${t}</span></div>`).join("");
             if (nt) {
               const partes = [];
               if (mt.etapa) partes.push(`Right now: ${esc(mt.etapa)}.`);
+              if (mt.gpu) partes.push(
+                `Running on a rented ${esc(mt.gpu)} (${mt.nucleos || "?"} cores) ` +
+                `at ${(mt.gpu_hora || 0).toFixed(2)}/hour, ${(mt.horas || 0).toFixed(1)}h so far.`);
               if (validando) partes.push(
                 "This is the quality gate, not the funded search. No batch is " +
                 "spent on a target until it clears AUC-ROC 0.70 against " +
