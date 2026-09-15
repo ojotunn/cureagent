@@ -345,7 +345,8 @@
     <p class="note">Every purchase funds a batch of molecules, screened in the
        name of the address that paid for it. The batch is public the moment it
        runs — here, on the live view above, and in the downloadable data.</p>
-    <div class="lote-resumo" id="loteResumo" style="margin-top:16px"></div>
+    <div class="lote-resumo" id="motorCaixa" hidden style="margin-top:16px"></div>
+    <div class="lote-resumo" id="loteResumo" style="margin-top:12px"></div>
     <div id="loteCorpo"></div>
   </section>
 
@@ -859,7 +860,24 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
         const p = document.getElementById("pulso");
         const vivo = lt.modo === "live";
         p.className = "pulso" + (vivo ? "" : " parado");
-        p.lastElementChild.textContent = vivo ? "live" : "not running";
+        const mt = lt.motor || {};
+        p.lastElementChild.textContent = vivo
+          ? (mt.estado === "screening"
+             ? `screening on ${mt.gpu || "GPU"} · ${mt.nucleos || "?"} cores`
+             : "live")
+          : "not running";
+        const cx = document.getElementById("motorCaixa");
+        if (cx) {
+          if (mt.estado) {
+            cx.hidden = false;
+            cx.innerHTML = [
+              [fmt(mt.triadas || 0), "molecules screened"],
+              [(mt.por_hora ? fmt(mt.por_hora) : "—"), "per hour"],
+              [mt.receptor || "—", "target on the bench"],
+              [mt.gpu || "—", "rented hardware"],
+            ].map(([b, t]) => `<div><b>${esc(String(b))}</b><span>${t}</span></div>`).join("");
+          } else cx.hidden = true;
+        }
       })
       .catch(() => {
         const p = document.getElementById("pulso");

@@ -1,6 +1,6 @@
 {
  "_comentario": "Lotes financiados por compra. O agente escreve aqui: le a compra na chain (publico, sem carteira) e registra o lote que disparou em nome daquele endereco. Vazio ate o token existir.",
- "modo": "queued",
+ "modo": "live",
  "mostrar_endereco": "truncado",
  "atualizado_em": "2026-09-15 00:41",
  "resumo": {
@@ -1467,5 +1467,14 @@
    "bloco": 63237405,
    "estado": "queued"
   }
- ]
+ ],
+ "motor": {
+  "estado": "screening",
+  "receptor": "TcCYP51 (PDB 3KHM)",
+  "gpu": "RTX 4000 SFF Ada",
+  "nucleos": 56,
+  "processos_vina": 59,
+  "preparadas": 191,
+  "atualizado": "2026-09-14 22:02"
+ }
 }
