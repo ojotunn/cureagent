@@ -153,6 +153,9 @@ function deploy(msg) {
     execSync(`git -c user.name=ojotunn -c user.email=jotunnartworks@gmail.com ` +
              `commit -q -m "${msg}"`, { cwd: RAIZ, stdio: "ignore" });
     execSync("git push -q origin main", { cwd: RAIZ, stdio: "ignore", timeout: 180000 });
+    // o Railway deste projeto nao deploya sozinho no push: tem que mandar subir
+    execSync("railway up --service cureagent --detach",
+             { cwd: RAIZ, stdio: "ignore", timeout: 300000 });
     return true;
   } catch { return false; }
 }
