@@ -77,9 +77,11 @@ async function leChain() {
   // A janela era rolante (fim - 200000). Conforme a chain avanca, compras
   // antigas saiam pela tras da janela e sumiam da fila sem aviso. O inicio
   // agora fica preso no bloco mais antigo ja visto.
-  const de = vivo.desdeBloco != null
-    ? vivo.desdeBloco
-    : Math.max(0, fim - 200000);
+  // O piso vem do token.json, medido varrendo a chain: antes cada instancia
+  // fixava o inicio no primeiro bloco que ela mesma tinha visto, e quem subiu
+  // mais tarde comecava depois do lancamento e perdia os primeiros compradores.
+  const piso = Number(tk.bloco_lancamento) || Math.max(0, fim - 200000);
+  const de = vivo.desdeBloco != null ? Math.min(vivo.desdeBloco, piso) : piso;
 
   const FATIA = 50000;
   const eventos = [];
