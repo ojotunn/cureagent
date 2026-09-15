@@ -1470,7 +1470,7 @@
  ],
  "motor": {
   "estado": "validating",
-  "etapa": "searching for a non-covalent crystal",
+  "etapa": "preparing the receptor",
   "alvo": "T. cruzi trypanothione reductase",
   "alvo_nota": "Deep hydrophobic pocket, organic FAD cofactor, no catalytic metal — the three properties the two rejected targets lacked.",
   "receptor": "selecting crystal",
@@ -1479,6 +1479,6 @@
   "docadas": 0,
   "auc": null,
   "corte": 0.7,
-  "atualizado": "2026-09-15 01:44"
+  "atualizado": "2026-09-15 01:45"
  }
 }
