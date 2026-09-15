@@ -346,6 +346,7 @@
        name of the address that paid for it. The batch is public the moment it
        runs — here, on the live view above, and in the downloadable data.</p>
     <div class="lote-resumo" id="motorCaixa" hidden style="margin-top:16px"></div>
+    <p class="note" id="motorNota" hidden style="margin-top:8px"></p>
     <div class="lote-resumo" id="loteResumo" style="margin-top:12px"></div>
     <div id="loteCorpo"></div>
   </section>
@@ -861,22 +862,38 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
         const vivo = lt.modo === "live";
         p.className = "pulso" + (vivo ? "" : " parado");
         const mt = lt.motor || {};
+        const validando = mt.estado === "validating";
         p.lastElementChild.textContent = vivo
-          ? (mt.estado === "screening"
-             ? `screening on ${mt.gpu || "GPU"} · ${mt.nucleos || "?"} cores`
-             : "live")
+          ? `${validando ? "validating" : "screening"} on ${mt.gpu || "GPU"} · ${mt.nucleos || "?"} cores`
           : "not running";
         const cx = document.getElementById("motorCaixa");
+        const nt = document.getElementById("motorNota");
         if (cx) {
           if (mt.estado) {
             cx.hidden = false;
-            cx.innerHTML = [
-              [fmt(mt.triadas || 0), "molecules screened"],
-              [(mt.por_hora ? fmt(mt.por_hora) : "—"), "per hour"],
-              [mt.receptor || "—", "target on the bench"],
-              [mt.gpu || "—", "rented hardware"],
-            ].map(([b, t]) => `<div><b>${esc(String(b))}</b><span>${t}</span></div>`).join("");
-          } else cx.hidden = true;
+            const campos = validando
+              ? [[fmt(mt.docadas || 0), "molecules docked"],
+                 [mt.auc != null ? mt.auc.toFixed(3) : "—", "AUC-ROC · needs ≥ 0.70"],
+                 [mt.alvo || "—", "target on the bench"],
+                 [mt.gpu || "—", "rented hardware"]]
+              : [[fmt(mt.triadas || 0), "molecules screened"],
+                 [(mt.por_hora ? fmt(mt.por_hora) : "—"), "per hour"],
+                 [mt.receptor || "—", "target on the bench"],
+                 [mt.gpu || "—", "rented hardware"]];
+            cx.innerHTML = campos.map(([b, t]) =>
+              `<div><b>${esc(String(b))}</b><span>${t}</span></div>`).join("");
+            if (nt) {
+              const partes = [];
+              if (mt.etapa) partes.push(`Right now: ${esc(mt.etapa)}.`);
+              if (validando) partes.push(
+                "This is the quality gate, not the funded search. No batch is " +
+                "spent on a target until it clears AUC-ROC 0.70 against " +
+                "property-matched decoys. Two targets already failed it.");
+              if (mt.alvo_nota) partes.push(esc(mt.alvo_nota));
+              nt.innerHTML = partes.join(" ");
+              nt.hidden = partes.length === 0;
+            }
+          } else { cx.hidden = true; if (nt) nt.hidden = true; }
         }
       })
       .catch(() => {

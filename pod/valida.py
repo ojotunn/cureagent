@@ -51,13 +51,13 @@ def acha_cristal(termo_pdb):
     q = {"query": {"type":"terminal","service":"full_text",
                    "parameters":{"value":termo_pdb}},
          "return_type":"entry",
-         "request_options":{"paginate":{"start":0,"rows":40}}}
+         "request_options":{"paginate":{"start":0,"rows":100}}}
     ids = [x["identifier"] for x in
            get(RCSB + "?json=" + urllib.parse.quote(json.dumps(q))).get("result_set",[])]
     log(f"  {len(ids)} estruturas na busca")
 
     candidatos = []
-    for pdb_id in ids[:20]:
+    for pdb_id in ids[:35]:
         try:
             e = get(f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id}")
         except Exception:
@@ -273,15 +273,29 @@ def main():
     log(f"ALVO: {termo_chembl} [{organismo}]\n")
 
     log("1. procurando cristal nao-covalente com ligante drug-like")
-    c = acha_cristal(termo_pdb)
-    if not c: log("  NENHUM cristal serve — parando"); return
-    res, pdb_id, code, n, t = c
-    log(f"  escolhido: {pdb_id}/{code}  {res} A  {n} atomos  {t} torsoes\n")
+    candidatos = acha_cristal(termo_pdb)
+    if not candidatos:
+        log("  NENHUM cristal serve — parando"); return
+    log(f"  {len(candidatos)} cristais candidatos
+")
 
     log("2. preparando receptor")
-    rec, centro, tam = prepara_receptor(pdb_id, code)
-    if not rec: return
-    log(f"  caixa: centro {[round(v,1) for v in centro]} tamanho {[round(v,1) for v in tam]}\n")
+    rec = centro = tam = None
+    pdb_id = code = None
+    for cres, cpdb, ccode, cn, ct in candidatos:
+        log(f"  tentando {cpdb}/{ccode}  {cres} A  {cn} atomos  {ct} torsoes")
+        try:
+            rec, centro, tam = prepara_receptor(cpdb, ccode)
+        except Exception as e:
+            log(f"  !! {type(e).__name__}: {e}"); rec = None
+        if rec:
+            pdb_id, code = cpdb, ccode
+            break
+    if not rec:
+        log("  nenhum candidato preparou — parando"); return
+    log(f"  escolhido {pdb_id}/{code} · caixa centro "
+        f"{[round(v,1) for v in centro]} tamanho {[round(v,1) for v in tam]}
+")
 
     log("3. inibidores medidos")
     tid, nome, total = alvo_chembl(termo_chembl, organismo)
