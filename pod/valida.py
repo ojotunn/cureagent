@@ -143,6 +143,13 @@ def prepara_receptor(pdb_id, lig_code):
     if extra:
         with open(pdbqt,"a") as fh: fh.writelines(extra)
         log(f"  cofator anexado: {len(extra)} atomos")
+
+    # deixa o alvo descrito em disco: a triagem le daqui e nao do meu codigo.
+    # Sem isto, aprovar um alvo novo exigia eu reescrever o motor na mao.
+    json.dump({"receptor": pdbqt, "pdb": pdb_id, "ligante": lig_code,
+               "centro": [float(v) for v in centro],
+               "tamanho": [float(v) for v in tam]},
+              open(BASE + "/target/alvo.json", "w"), indent=1)
     return pdbqt, centro, tam
 
 

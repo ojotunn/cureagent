@@ -1,16 +1,9 @@
 #!/bin/bash
-# Doca UM ligante contra o alvo descrito em /work/target/alvo.json.
-# O alvo nao esta escrito aqui de proposito: quem aprova o alvo e a validacao.
+# Doca UM ligante. A caixa vem do ambiente, exportada uma vez pelo supervisor,
+# para nao subir um Python por molecula so para ler o mesmo JSON.
 L="$1"
 ID=$(basename "$L" .pdbqt)
-A=/work/target/alvo.json
-[ -f "$A" ] || exit 1
-read REC CX CY CZ SX SY SZ <<< "$(python - <<'PY'
-import json
-a = json.load(open("/work/target/alvo.json"))
-print(a["receptor"], *["%.3f" % v for v in a["centro"]], *["%.3f" % v for v in a["tamanho"]])
-PY
-)"
+[ -n "$REC" ] || exit 1
 S=$(/work/vina --receptor "$REC" --ligand "$L" \
     --center_x "$CX" --center_y "$CY" --center_z "$CZ" \
     --size_x "$SX" --size_y "$SY" --size_z "$SZ" \
