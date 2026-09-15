@@ -12,7 +12,7 @@ from rdkit.Chem import AllChem
 
 RDLogger.DisableLog("rdApp.*")
 BASE = "/work"
-LIGS = BASE + "/ligs"
+LIGS = sys.argv[2] if len(sys.argv) > 2 else BASE + "/prod/ligs"
 
 
 def prepara(args):

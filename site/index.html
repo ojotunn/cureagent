@@ -1075,13 +1075,13 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
       for (const a of pr) {
         for (const b of pl) {
           const dx=a[0]-b[0], dy=a[1]-b[1], dz=a[2]-b[2];
-          if (dx*dx + dy*dy + dz*dz < 64) { perto.add(a[4]); break; }
+          if (dx*dx + dy*dy + dz*dz < 42) { perto.add(a[4]); break; }
         }
       }
       const resi = [...perto].map(Number).filter(n => !isNaN(n));
       if (resi.length) {
         view.addStyle({model: 0, resi: resi},
-                      {stick: {radius: 0.16, color: "#0e7c6b"}});
+                      {stick: {radius: 0.13, color: "#0e7c6b"}});
       }
     }
     // enquadra o SITIO, nao a proteina inteira: e ali que o trabalho acontece
