@@ -1050,14 +1050,14 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     fetch("data/site_ref.pdb").then(r => r.text()).catch(() => null),
   ]).then(([rec, lig]) => {
     view.addModel(rec, "pdb");
-    view.setStyle({model: 0}, {cartoon: {color: "#7d8a96", opacity: 0.95}});
+    view.setStyle({model: 0}, {cartoon: {color: "#7d8a96", opacity: 0.55}});
     let temLig = false;
     if (lig && lig.trim()) {
       view.addModel(lig, "pdb");
       temLig = true;
       view.setStyle({model: 1}, {stick: {radius: 0.26, color: "#c2410c"}});
       view.addStyle({model: 0, within: {distance: 8, sel: {model: 1}}},
-                    {stick: {radius: 0.12, color: "#0e7c6b"}});
+                    {stick: {radius: 0.15, color: "#0e7c6b"}});
     }
     // enquadra o SITIO, nao a proteina inteira: e ali que o trabalho acontece
     view.zoomTo(temLig ? {model: 1} : {model: 0});
@@ -1106,7 +1106,7 @@ function tocaPoses(view, indiceModelo) {
       if (modelo !== null) view.removeModel(modelo);
       modelo = view.addModel(txt, "xyz");
       view.setStyle({model: modelo},
-                    {stick: {radius: 0.17, colorscheme: "orangeCarbon"}});
+                    {stick: {radius: 0.21, colorscheme: "orangeCarbon"}});
       view.render();
 
       document.getElementById("npId").textContent = p.id;
