@@ -347,6 +347,14 @@
        runs — here, on the live view above, and in the downloadable data.</p>
     <div class="lote-resumo" id="motorCaixa" hidden style="margin-top:16px"></div>
     <p class="note" id="motorNota" hidden style="margin-top:8px"></p>
+    <div id="filaAlvos" hidden style="margin-top:22px">
+      <h3 style="font-size:14px;letter-spacing:.08em;text-transform:uppercase;
+                 color:var(--fraco);font-weight:600;margin:0 0 4px">The queue of targets</h3>
+      <p class="note" style="margin:0 0 10px">This is a process, not a promise. Each
+         protein has to clear the same gate before a single funded molecule is spent
+         on it. Rejections stay on this list, with the number that rejected them.</p>
+      <div id="filaCorpo"></div>
+    </div>
     <div class="lote-resumo" id="loteResumo" style="margin-top:12px"></div>
     <div id="loteCorpo"></div>
   </section>
@@ -683,7 +691,7 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
 
   $("#nums").innerHTML = [
     [fmt(t.moleculas_triadas), "molecules docked", t.onde_rodou || ""],
-    ["$" + (t.custo_gpu_usd ?? 0).toFixed(2), "spent on GPU", "everything so far ran on local CPU"],
+    ["$" + (t.custo_gpu_usd ?? 0).toFixed(2), "spent on GPU", "that campaign ran on local CPU, before the rented pod"],
     [enr.auc ? enr.auc.toFixed(3) : "—", "enrichment AUC", "0.50 = coin flip · 0.70 = useful"],
     [fmt((alvo.pdb_validacao || []).length + (alvo.pdb_triagem ? 1 : 0)),
      "crystal structures analysed", "every one checked for covalent ligands first"],
@@ -911,6 +919,30 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
         }
         // O cabecalho anunciava a Cruzaina, que e o resultado ARQUIVADO, como se
         // fosse o alvo do momento. Quem chega no site tem que ler a bancada.
+        // A fila de alvos, com o veredicto de cada um. Vem da placa, nao daqui.
+        const fa = lt.fila_alvos || [];
+        const cxFila = document.getElementById("filaAlvos");
+        if (cxFila) {
+          cxFila.hidden = fa.length === 0;
+          if (fa.length) {
+            const rotulo = {passed: "passed", rejected: "rejected", queued: "waiting"};
+            document.getElementById("filaCorpo").innerHTML = fa.map((a, n) => {
+              const cor = a.estado === "passed" ? "pass"
+                        : a.estado === "rejected" ? "fail" : "warnc";
+              const num = a.auc != null ? `AUC ${a.auc.toFixed(3)}`
+                        : a.motivo ? "no test possible" : "—";
+              return `<div class="kv" style="align-items:flex-start">
+                <span style="max-width:62%">
+                  <b style="color:var(--ink)">${n + 1}. ${esc(a.nome)}</b><br>
+                  <small style="color:var(--fraco)">${esc(a.doenca)} · ${esc(a.porque)}</small>
+                </span>
+                <b><span class="${cor}">${rotulo[a.estado] || a.estado}</span>
+                   <small style="color:var(--fraco);display:block;font-weight:400">
+                   ${esc(num)}</small></b></div>`;
+            }).join("");
+          }
+        }
+
         const st = document.getElementById("estado");
         if (st && mt.estado) {
           st.textContent = validando
