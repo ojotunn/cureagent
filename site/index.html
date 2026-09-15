@@ -918,6 +918,19 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
                 `Hardware: ${placas > 1 ? placas + " rented cards" : "one rented card"}, ` +
                 `${esc(mt.gpu)}, ${fmt((mt.nucleos || 0) * Math.max(placas, 1))} cores in total, ` +
                 `$${(mt.gpu_hora || 0).toFixed(2)}/hour combined, ${(mt.horas || 0).toFixed(1)}h elapsed.`);
+              // A biblioteca disponivel contra o que a fila tem direito. Sem
+              // isto a pagina poderia contar moleculas subindo enquanto o
+              // estoque real e uma fracao do que foi vendido.
+              if (mt.biblioteca != null) {
+                const devido = (lt.resumo && lt.resumo.cota_total) || 0;
+                partes.push(
+                  `Library ready to screen: ${fmt(mt.biblioteca)} prepared molecules` +
+                  (devido ? ` against ${fmt(devido)} owed to the queue` : "") +
+                  (mt.biblioteca < devido
+                    ? ". Collecting a larger library is open work, and it is "
+                      + "collection, not compute."
+                    : "."));
+              }
               if (validando) partes.push(
                 "This is the quality gate, not the funded search. No batch is " +
                 "spent on a target until it clears AUC-ROC 0.70 against " +

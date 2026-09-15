@@ -128,6 +128,7 @@ def main():
 
     d = {
         "nucleos": nucleos,
+        "biblioteca": conta(BASE + "/prod/ligs", ".pdbqt", "_out"),
         "fila_alvos": fila(validando),
         "atualizado": time.strftime("%Y-%m-%d %H:%M", time.gmtime()),
     }
