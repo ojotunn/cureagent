@@ -78,7 +78,7 @@ def etapa_e_cristal(log):
     return etapa, cristal
 
 
-def fila():
+def fila(validando=False):
     """A fila de alvos com o veredicto de cada um. E o que prova que isto e um
     processo e nao uma promessa: os reprovados ficam na lista, com o numero."""
     try:
@@ -105,6 +105,12 @@ def fila():
             "motivo": (r or {}).get("motivo"),
             "pdb": (r or {}).get("pdb"),
         })
+    # o primeiro sem veredicto e o que esta na bancada agora
+    if validando:
+        for a in saida:
+            if a["estado"] == "queued":
+                a["estado"] = "validating"
+                break
     return saida
 
 
@@ -122,7 +128,7 @@ def main():
 
     d = {
         "nucleos": nucleos,
-        "fila_alvos": fila(),
+        "fila_alvos": fila(validando),
         "atualizado": time.strftime("%Y-%m-%d %H:%M", time.gmtime()),
     }
 
@@ -136,7 +142,7 @@ def main():
             "biblioteca": conta(BASE + "/prod/ligs", ".pdbqt", "_out"),
         })
     elif validando:
-        atual = next((f for f in d["fila_alvos"] if f["estado"] == "queued"), None)
+        atual = next((f for f in d["fila_alvos"] if f["estado"] == "validating"), None)
         d.update({
             "estado": "validating",
             "etapa": etapa or "starting up",
