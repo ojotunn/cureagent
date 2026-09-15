@@ -1,9 +1,9 @@
 #!/bin/bash
 # Triagem financiada. So roda em alvo APROVADO, e usa a biblioteca de producao,
-# separada da biblioteca de validacao — misturar as duas corromperia o AUC.
+# separada da de validacao — misturar as duas corromperia o AUC.
 export PATH=/opt/conda/bin:/usr/local/bin:$PATH
 cd /work
-mkdir -p out prod/ligs
+mkdir -p out prod/ligs poses
 touch out/scores.jsonl
 NUC=$(nproc)
 PAR=$((NUC - 4)); [ $PAR -lt 1 ] && PAR=1
@@ -24,7 +24,9 @@ PY
 )"
 
   cut -d'"' -f4 out/scores.jsonl 2>/dev/null | sort -u > /tmp/feitos.txt
-  ls prod/ligs/*.pdbqt 2>/dev/null | sed 's|.*/||; s|\.pdbqt$||' | sort > /tmp/todos.txt
+  # o grep tira as POSES que o Vina possa ter deixado ao lado dos ligantes
+  ls prod/ligs/*.pdbqt 2>/dev/null | grep -v '_out\.pdbqt$' \
+    | sed 's|.*/||; s|\.pdbqt$||' | sort > /tmp/todos.txt
   comm -23 /tmp/todos.txt /tmp/feitos.txt | sed 's|^|/work/prod/ligs/|; s|$|.pdbqt|' > /tmp/fila.txt
   N=$(wc -l < /tmp/fila.txt)
 
@@ -33,8 +35,10 @@ PY
     echo "$(date -u +%H:%M:%S) preparando ligantes (fila=$N)" >> out/motor.log
     timeout 900 python /work/prepara.py 800 /work/prod/ligs >> out/prep.log 2>&1
     DEPOIS=$(ls prod/ligs/*.pdbqt 2>/dev/null | wc -l)
-    # biblioteca esgotada: nao adianta girar em falso queimando placa
-    [ "$DEPOIS" -le "$ANTES" ] && { echo "$(date -u +%H:%M:%S) biblioteca esgotada" >> out/motor.log; sleep 120; }
+    if [ "$DEPOIS" -le "$ANTES" ]; then
+      echo "$(date -u +%H:%M:%S) biblioteca esgotada em $DEPOIS ligantes" >> out/motor.log
+      sleep 120
+    fi
     continue
   fi
 

@@ -1,10 +1,15 @@
 #!/bin/bash
 # Doca UM ligante. A caixa vem do ambiente, exportada uma vez pelo supervisor,
-# para nao subir um Python por molecula so para ler o mesmo JSON.
+# para nao subir um Python por molecula so para reler o mesmo JSON.
+#
+# A pose vai para /work/poses. Sem --out o Vina grava <ligante>_out.pdbqt DENTRO
+# da biblioteca, e na volta seguinte o motor tentaria docar a propria saida.
 L="$1"
 ID=$(basename "$L" .pdbqt)
 [ -n "$REC" ] || exit 1
+mkdir -p /work/poses
 S=$(/work/vina --receptor "$REC" --ligand "$L" \
+    --out "/work/poses/$ID.pdbqt" \
     --center_x "$CX" --center_y "$CY" --center_z "$CZ" \
     --size_x "$SX" --size_y "$SY" --size_z "$SZ" \
     --exhaustiveness 8 --seed 42 --num_modes 1 --cpu 1 2>/dev/null \
