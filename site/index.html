@@ -949,20 +949,26 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
         if (cxFila) {
           cxFila.hidden = fa.length === 0;
           if (fa.length) {
-            const rotulo = {passed: "passed", rejected: "rejected", queued: "waiting"};
+            const rotulo = {passed: "passed", rejected: "failed the gate",
+                            untestable: "no test possible", queued: "waiting",
+                            validating: "on the bench now"};
             document.getElementById("filaCorpo").innerHTML = fa.map((a, n) => {
               const cor = a.estado === "passed" ? "pass"
                         : a.estado === "rejected" ? "fail" : "warnc";
-              const num = a.auc != null ? `AUC ${a.auc.toFixed(3)}`
-                        : a.motivo ? "no test possible" : "—";
-              return `<div class="kv" style="align-items:flex-start">
-                <span style="max-width:62%">
+              const dir = a.auc != null ? `AUC ${a.auc.toFixed(3)}` : "";
+              const porque = esc(a.doenca) + " · " + esc(a.porque);
+              const motivo = a.motivo
+                ? `<br><span style="color:var(--fraco)">Why no test ran: ${esc(a.motivo)}</span>`
+                : "";
+              return `<div class="kv" style="align-items:flex-start;gap:18px">
+                <span style="max-width:70%">
                   <b style="color:var(--ink)">${n + 1}. ${esc(a.nome)}</b><br>
-                  <small style="color:var(--fraco)">${esc(a.doenca)} · ${esc(a.porque)}</small>
+                  <small style="color:var(--fraco)">${porque}${motivo}</small>
                 </span>
-                <b><span class="${cor}">${rotulo[a.estado] || a.estado}</span>
-                   <small style="color:var(--fraco);display:block;font-weight:400">
-                   ${esc(num)}</small></b></div>`;
+                <b style="text-align:right;white-space:nowrap">
+                  <span class="${cor}">${rotulo[a.estado] || a.estado}</span>
+                  ${dir ? `<small style="color:var(--fraco);display:block;font-weight:400">${dir}</small>` : ""}
+                </b></div>`;
             }).join("");
           }
         }

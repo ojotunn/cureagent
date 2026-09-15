@@ -99,8 +99,12 @@ def fila(validando=False):
             "doenca": a["doenca"],
             "porque": a["porque"],
             "auc": round(auc, 3) if isinstance(auc, (int, float)) else None,
+            # "rejected" e um veredicto do portao: o AUC rodou e ficou abaixo
+            # do corte. Quando o teste nem pode ser montado, chamar de rejeitado
+            # seria dizer que a ciencia respondeu nao, quando ninguem perguntou.
             "estado": ("passed" if isinstance(auc, (int, float)) and auc >= CORTE
-                       else "rejected" if r is not None
+                       else "rejected" if isinstance(auc, (int, float))
+                       else "untestable" if r is not None
                        else "queued"),
             "motivo": (r or {}).get("motivo"),
             "pdb": (r or {}).get("pdb"),

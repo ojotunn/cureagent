@@ -29,7 +29,12 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 
 COFATORES = {"NAD", "NAI", "NAP", "NDP", "FAD", "FMN", "HEM", "ZN", "MG", "MN"}
 IGNORAR = {"HOH","SO4","GOL","EDO","PO4","CL","NA","K","CA","ACT","DMS","MES",
-           "TRS","PEG","IOD","BR","NO3","FMT","ACY","IMD","CIT","EPE","MPD","SCN"}
+           "TRS","PEG","IOD","BR","NO3","FMT","ACY","IMD","CIT","EPE","MPD","SCN",
+           # familia do polietilenoglicol e outros aditivos de cristalizacao: nao
+           # sao ligantes, e um deles (PG4) chegou a definir a caixa de docking
+           "PG4","PGE","P6G","1PE","2PE","PE4","PE5","PE8","XPE","7PE","12P",
+           "P33","DIO","TRT","BME","DTT","TCE","SIN","MRD","BU3","GOL","FLC",
+           "TAR","MLI","MLA","SUC","AKR","NH4","UNX","UNL"}
 EXH = 8
 SEED = 42
 N_ATIVOS = int(sys.argv[4]) if len(sys.argv) > 4 else 50
@@ -47,17 +52,78 @@ def log(m): print(m, flush=True)
 
 
 # ---------------------------------------------------------------- cristal
-def acha_cristal(termo_pdb):
-    q = {"query": {"type":"terminal","service":"full_text",
-                   "parameters":{"value":termo_pdb}},
-         "return_type":"entry",
-         "request_options":{"paginate":{"start":0,"rows":100}}}
-    ids = [x["identifier"] for x in
-           get(RCSB + "?json=" + urllib.parse.quote(json.dumps(q))).get("result_set",[])]
-    log(f"  {len(ids)} estruturas na busca")
+def confere_identidade(pdb_id, termo_proteina, organismo):
+    """A estrutura e mesmo esta proteina, neste organismo?
+
+    O full_text do RCSB casa por relevancia, nao por identidade. Procurando
+    GAPDH de T. cruzi ele devolveu di-hidrofolato redutase; procurando
+    tripanotiona redutase de T. cruzi devolveu a de T. brucei, e o validador
+    docou inibidores de uma especie na proteina de outra e publicou o AUC
+    como se fosse verdade. Sem esta conferencia o resto nao significa nada.
+    """
+    try:
+        ids = (get("https://data.rcsb.org/rest/v1/core/entry/%s" % pdb_id)
+               .get("rcsb_entry_container_identifiers", {})
+               .get("polymer_entity_ids") or ["1"])
+    except Exception:
+        return False
+    esperado_org = [p for p in organismo.lower().split() if len(p) > 2]
+    chaves = [p for p in termo_proteina.lower().replace("-", " ").split()
+              if len(p) > 3]
+    for eid in ids[:6]:
+        try:
+            d = get("https://data.rcsb.org/rest/v1/core/polymer_entity/%s/%s"
+                    % (pdb_id, eid))
+        except Exception:
+            continue
+        desc = ((d.get("rcsb_polymer_entity") or {})
+                .get("pdbx_description") or "").lower()
+        orgs = " ".join((o.get("scientific_name") or "")
+                        for o in (d.get("rcsb_entity_source_organism") or [])).lower()
+        if not all(p in orgs for p in esperado_org):
+            continue
+        acertos = sum(1 for k in chaves if k in desc)
+        if acertos < max(1, (len(chaves) + 1) // 2):
+            continue
+        return True
+    return False
+
+
+def acha_cristal(termo_pdb, termo_proteina=None, organismo=None):
+    # Duas consultas em vez de uma. A frase inteira e precisa mas estreita:
+    # para a tripanotiona redutase ela devolvia 13 entradas. O nome da
+    # proteina sozinho devolve 100, de varios organismos, e quem separa o
+    # organismo certo e a conferencia de identidade, nao a sorte da busca.
+    termos = [termo_pdb]
+    if termo_proteina and termo_proteina.lower() not in termo_pdb.lower():
+        termos.append(termo_proteina)
+    elif termo_proteina:
+        termos.append(termo_proteina)
+    ids = []
+    for t in termos:
+        q = {"query": {"type": "terminal", "service": "full_text",
+                       "parameters": {"value": t}},
+             "return_type": "entry",
+             "request_options": {"paginate": {"start": 0, "rows": 100}}}
+        try:
+            achados = [x["identifier"] for x in
+                       get(RCSB + "?json=" + urllib.parse.quote(json.dumps(q)))
+                       .get("result_set", [])]
+        except Exception as e:
+            log("  busca '%s' falhou: %s" % (t, e))
+            achados = []
+        for i in achados:
+            if i not in ids:
+                ids.append(i)
+    log("  %d estruturas na busca" % len(ids))
 
     candidatos = []
-    for pdb_id in ids[:35]:
+    for pdb_id in ids[:60]:
+        # identidade primeiro: se nao e a proteina certa no organismo certo,
+        # nem vale gastar chamada olhando os ligantes dela
+        if termo_proteina and organismo:
+            if not confere_identidade(pdb_id, termo_proteina, organismo):
+                continue
         try:
             e = get(f"https://data.rcsb.org/rest/v1/core/entry/{pdb_id}")
         except Exception:
@@ -274,15 +340,33 @@ def doca(args):
     open(saida,"w").write(str(sc))
 
 
+def registra_parada(motivo, extra=None):
+    """Toda saida antecipada grava o motivo REAL.
+
+    Antes quem registrava era o ciclo, e ele so sabia que nao houve
+    resultado, entao escrevia um palpite em forma de ou/ou: sem cristal
+    nao-covalente OU sem inibidor medido. Para a pteridina redutase, que tem
+    79 inibidores medidos, esse palpite era falso, e ia para a pagina como se
+    fosse ciencia.
+    """
+    d = {"auc": None, "motivo": motivo}
+    if extra:
+        d.update(extra)
+    json.dump(d, open(BASE + "/out/resultado.json", "w"), indent=1)
+    log("  PARANDO: " + motivo)
+
+
 def main():
     termo_pdb, termo_chembl, organismo = sys.argv[1], sys.argv[2], sys.argv[3]
     t0 = time.time()
     log(f"ALVO: {termo_chembl} [{organismo}]\n")
 
     log("1. procurando cristal nao-covalente com ligante drug-like")
-    candidatos = acha_cristal(termo_pdb)
+    candidatos = acha_cristal(termo_pdb, termo_chembl, organismo)
     if not candidatos:
-        log("  NENHUM cristal serve — parando"); return
+        registra_parada("no PDB entry matched this protein in this organism, "
+                        "or none had a non-covalent drug-like ligand")
+        return
     log(f"  {len(candidatos)} cristais candidatos")
 
     log("2. preparando receptor")
@@ -298,15 +382,27 @@ def main():
             pdb_id, code = cpdb, ccode
             break
     if not rec:
-        log("  nenhum candidato preparou — parando"); return
+        registra_parada("a matching crystal was found but the receptor could "
+                        "not be prepared from any candidate")
+        return
     log(f"  escolhido {pdb_id}/{code} · caixa centro "
         f"{[round(v,1) for v in centro]} tamanho {[round(v,1) for v in tam]}")
 
     log("3. inibidores medidos")
     tid, nome, total = alvo_chembl(termo_chembl, organismo)
-    if not tid: log("  alvo nao achado no ChEMBL"); return
+    if not tid:
+        registra_parada("no single-protein ChEMBL target for this name "
+                        "in this organism")
+        return
     log(f"  {tid} ({nome}) — {total} medidas")
     ativos = coleta(tid)[:N_ATIVOS]
+    if not ativos:
+        registra_parada("ChEMBL has %d measurements for this target but none "
+                        "usable: needs IC50 or Ki in nM, potency under 10 uM, "
+                        "molecular weight under 600 and at most 10 rotatable "
+                        "bonds" % total,
+                        {"chembl": tid, "medidas": total})
+        return
     log(f"  {len(ativos)} aproveitaveis, mais potente {ativos[0]['nM']:.2f} nM\n")
 
     log("4. decoys pareados")
@@ -346,6 +442,16 @@ def main():
             if s1 < s2: ganhos += 1
             elif s1 == s2: emp += 1
     auc = (ganhos + 0.5*emp)/pares
+    MIN_ATIVOS = 15
+    if len(at) < MIN_ATIVOS:
+        # AUC sobre 5 ativos nao e veredicto, e ruido com aparencia de numero.
+        # Foi assim que a tripanotiona redutase "reprovou" com 0,209.
+        registra_parada("only %d actives survived preparation and docking, "
+                        "below the %d needed for an enrichment verdict to mean "
+                        "anything" % (len(at), MIN_ATIVOS),
+                        {"auc_bruto": round(auc, 3), "n_ativos": len(at),
+                         "n_decoys": len(de), "pdb": pdb_id})
+        return
     res_list.sort(key=lambda r: r[0])
     def ef(frac):
         k = max(1, round(len(res_list)*frac))
