@@ -1,6 +1,6 @@
 # EHRLICH — SPEC congelada
 
-**Ticker:** EHRLICH · **Dominio:** ehrlich.bio · **Rede:** Robinhood Chain (pons v2) · **Porta local:** 8440
+**Ticker:** EHRLICH · **CA:** 0xf04C4b18cD3f6Ca926dC14816e17BAce56B2cA62 · **Dominio:** ehrlich.bio · **Rede:** Robinhood Chain (pons v2) · **Porta local:** 8440
 **Data:** 13/09/2026 · **Estado:** FATIA 1 RODADA — alvo reprovado, ver seção 0
 
 ---
@@ -86,7 +86,7 @@ ativo principal do projeto — vale mais que a narrativa.
 |---|---|---|
 | Taxa de lançamento | 0,0005 ETH (~$1,25) | lida da chain |
 | Supply | 1.000.000.000 (fixo) | pons |
-| Taxa do criador | **5%** em cada negociação da curva | escolhida; teto da pons é 10% |
+| Taxa do criador | **2%** em cada negociação da curva | REAL, lido da chain no lançamento (a spec previa 5%) |
 | Graduação | 4,2 ETH arrecadados | pons |
 | Dev buy | **0 no lançamento** | capital em risco só depois da resposta do mercado |
 | Taxa da curva (pons) | 1% | não é nossa |
