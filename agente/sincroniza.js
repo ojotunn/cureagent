@@ -22,6 +22,41 @@ const SSH = `ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ` +
 
 const GPU = "RTX 4000 SFF Ada";
 
+// .env sem dependencia: a chave da RunPod nunca e impressa
+try {
+  const bruto = fs.readFileSync(path.join(RAIZ, ".env"), "utf8");
+  for (let l of bruto.split(String.fromCharCode(10))) {
+    l = l.replace(String.fromCharCode(13), "");
+    if (!l || l.trim().startsWith("#")) continue;
+    const j = l.indexOf("=");
+    if (j <= 0) continue;
+    const k = l.slice(0, j).trim(), v = l.slice(j + 1).trim();
+    if (k && !process.env[k]) process.env[k] = v;
+  }
+} catch {}
+
+const POD_ID = (() => {
+  try { return fs.readFileSync(path.join(RAIZ, "pod.id"), "utf8").trim(); }
+  catch { return null; }
+})();
+
+// Quanto a placa ja custou NESTA corrida. Vem da RunPod, nao de estimativa minha.
+async function custoDaPlaca() {
+  if (!POD_ID || !process.env.RUNPOD_API_KEY) return null;
+  try {
+    const r = await fetch("https://rest.runpod.io/v1/pods/" + POD_ID,
+      { headers: { Authorization: "Bearer " + process.env.RUNPOD_API_KEY } });
+    if (!r.ok) return null;
+    const p = await r.json();
+    const ini = Date.parse(String(p.lastStartedAt || p.createdAt || "")
+                             .replace(" +0000 UTC", "Z").replace(" ", "T"));
+    if (!ini) return null;
+    const horas = (Date.now() - ini) / 3600000;
+    const hora = Number(p.costPerHr) || 0;
+    return { horas, hora, gasto: horas * hora };
+  } catch { return null; }
+}
+
 function remoto(cmd) {
   try {
     return execSync(`${SSH} "${cmd.replace(/"/g, '\\"')}"`,
@@ -81,7 +116,7 @@ function etapaDoLog(log) {
   return "starting up";
 }
 
-function montaMotor(d) {
+function montaMotor(d, custo) {
   if (d.validando || (d.resultado && !d.triando)) {
     const r = d.resultado;
     return {
@@ -93,6 +128,9 @@ function montaMotor(d) {
                  "metal — the three properties the two rejected targets lacked.",
       receptor: r ? `PDB ${r.pdb}` : "selecting crystal",
       gpu: GPU,
+      gpu_hora: custo ? Number(custo.hora.toFixed(2)) : null,
+      gpu_gasto_usd: custo ? Number(custo.gasto.toFixed(2)) : null,
+      horas: custo ? Number(custo.horas.toFixed(2)) : null,
       nucleos: d.nucleos,
       docadas: d.docadas,
       auc: r ? Number(r.auc.toFixed(3)) : null,
@@ -106,6 +144,9 @@ function montaMotor(d) {
       etapa: "screening the funded library",
       receptor: d.progresso?.receptor || "—",
       gpu: GPU,
+      gpu_hora: custo ? Number(custo.hora.toFixed(2)) : null,
+      gpu_gasto_usd: custo ? Number(custo.gasto.toFixed(2)) : null,
+      horas: custo ? Number(custo.horas.toFixed(2)) : null,
       nucleos: d.nucleos,
       triadas: d.triadas,
       por_hora: d.progresso?.por_hora || null,
@@ -116,10 +157,10 @@ function montaMotor(d) {
   return null;
 }
 
-function publica(d) {
+function publica(d, custo) {
   const arq = path.join(RAIZ, "site", "data", "lotes.json");
   const j = JSON.parse(fs.readFileSync(arq, "utf8"));
-  const motor = montaMotor(d);
+  const motor = montaMotor(d, custo);
 
   j.modo = motor ? "live" : "parado";
   j.motor = motor;
@@ -166,7 +207,8 @@ async function main() {
   for (;;) {
     try {
       const d = leituraDoPod();
-      const m = publica(d);
+      const custo = await custoDaPlaca();
+      const m = publica(d, custo);
       const nova = JSON.stringify([m?.estado, m?.etapa, m?.docadas, m?.triadas, m?.auc]);
       if (nova !== assinatura) {
         const ok = deploy(
