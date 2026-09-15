@@ -1477,11 +1477,11 @@
   "gpu": "RTX 4000 SFF Ada",
   "gpu_hora": 0.18,
   "gpu_gasto_usd": 0.37,
-  "horas": 2.04,
+  "horas": 2.06,
   "nucleos": 56,
-  "docadas": 319,
+  "docadas": 320,
   "auc": null,
   "corte": 0.7,
-  "atualizado": "2026-09-15 02:48"
+  "atualizado": "2026-09-15 02:49"
  }
 }
