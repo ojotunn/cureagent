@@ -801,8 +801,9 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
 
     document.getElementById("loteResumo").innerHTML = [
       [fmt(res.financiadores || 0), "people who paid"],
-      [fmt(res.moleculas_financiadas || 0), "molecules they funded"],
-      [(res.minutos_gpu || 0) + " min", "GPU time they bought"],
+      [fmt(res.moleculas_financiadas || 0), "molecules screened for them"],
+      [fmt(res.cota_total || 0), "molecules owed"],
+      [fmt(res.na_fila || 0), "batches queued"],
     ].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join("");
 
     if (!lotes.length) {
@@ -818,17 +819,21 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
 
     document.getElementById("loteCorpo").innerHTML =
       `<div class="tablewrap scroll"><table>
-        <thead><tr><th>when</th><th>address</th><th>molecules</th>
-          <th>best score</th><th>GPU</th><th></th></tr></thead><tbody>` +
+        <thead><tr><th>when</th><th>address</th><th>paid</th><th>molecules</th>
+          <th>best score</th><th>GPU</th><th>state</th></tr></thead><tbody>` +
       lotes.map(l => `<tr>
         <td>${esc(l.ts || "")}</td>
         <td class="addr">${l.tx
           ? `<a href="https://robinhoodchain.blockscout.com/tx/${esc(l.tx)}" target="_blank" rel="noopener">${esc(trunc(l.endereco))}</a>`
           : esc(trunc(l.endereco))}</td>
-        <td>${fmt(l.moleculas || 0)}</td>
+        <td>${l.eth != null ? l.eth.toFixed(5) + " ETH" : "—"}</td>
+        <td>${l.moleculas != null ? fmt(l.moleculas)
+              : `<span style="color:var(--dim)">${fmt(l.cota || 0)} owed</span>`}</td>
         <td>${l.melhor != null ? l.melhor.toFixed(2) : "—"}</td>
         <td>${l.gpu_min != null ? l.gpu_min + " min" : "—"}</td>
-        <td>${l.estado === "running" ? "<span class=\"warnc\">running</span>" : ""}</td>
+        <td>${l.estado === "running" ? `<span class="warnc">running</span>`
+              : l.estado === "pronto" ? `<span class="pass">done</span>`
+              : `<span style="color:var(--dim)">queued</span>`}</td>
       </tr>`).join("") + `</tbody></table></div>`;
 
     // marca como novo o que chegou depois da primeira carga
