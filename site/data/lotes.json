@@ -1473,12 +1473,15 @@
   "etapa": "docking actives against decoys",
   "alvo": "T. cruzi trypanothione reductase",
   "alvo_nota": "Deep hydrophobic pocket, organic FAD cofactor, no catalytic metal — the three properties the two rejected targets lacked.",
-  "receptor": "selecting crystal",
+  "receptor": "PDB 4DSG",
   "gpu": "RTX 4000 SFF Ada",
+  "gpu_hora": 0.18,
+  "gpu_gasto_usd": 0.27,
+  "horas": 1.52,
   "nucleos": 56,
-  "docadas": 182,
+  "docadas": 187,
   "auc": null,
   "corte": 0.7,
-  "atualizado": "2026-09-15 02:16"
+  "atualizado": "2026-09-15 02:17"
  }
 }
