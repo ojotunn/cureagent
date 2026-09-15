@@ -890,9 +890,12 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
         const frota = placas > 1
           ? `${placas}× ${mt.gpu || "GPU"} · ${fmt((mt.nucleos || 0) * placas)} cores`
           : `${mt.gpu || "GPU"} · ${mt.nucleos || "?"} cores`;
-        p.lastElementChild.textContent = vivo
-          ? `${validando ? "validating" : "screening"} on ${frota}`
-          : "not running";
+        // "idle" existe de verdade: a fila de alvos acabou e a placa parou.
+        // Chamar isso de screening seria a pagina afirmar trabalho que nao ha.
+        const ocioso = !mt.estado || mt.estado === "idle";
+        p.lastElementChild.textContent = !vivo ? "not running"
+          : ocioso ? `idle ${esc(mt.etapa || "between targets")}`
+          : `${validando ? "validating" : "screening"} on ${frota}`;
         const cx = document.getElementById("motorCaixa");
         const nt = document.getElementById("motorNota");
         if (cx) {
