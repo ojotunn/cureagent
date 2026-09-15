@@ -51,11 +51,20 @@ const vivo = {
 };
 
 const horaCache = new Map();
-async function horaDe(bloco) {
-  if (horaCache.has(bloco)) return horaCache.get(bloco);
-  const h = await horaDoBloco(bloco).catch(() => null);
-  horaCache.set(bloco, h);
-  return h;
+
+// Os horarios dos blocos eram buscados um a um, em serie. Com quase 500 compras
+// isso fazia o servidor levar quase um minuto para ter a fila depois de cada
+// deploy, e nesse intervalo a pagina mostrava o arquivo velho do disco como se
+// fosse o estado atual. Agora vao em paralelo, em lotes.
+async function carregaHoras(blocos) {
+  const faltam = [...new Set(blocos)].filter((b) => !horaCache.has(b));
+  const LOTE = 25;
+  for (let i = 0; i < faltam.length; i += LOTE) {
+    const fatia = faltam.slice(i, i + LOTE);
+    const horas = await Promise.all(
+      fatia.map((b) => horaDoBloco(b).catch(() => null)));
+    fatia.forEach((b, k) => horaCache.set(b, horas[k]));
+  }
 }
 
 /* ------------------------------------------------------ leitura da chain */
@@ -74,9 +83,10 @@ async function leChain() {
   }
 
   const compras = eventos.filter((e) => e.tipo === "compra");
+  await carregaHoras(compras.map((c) => c.bloco));
   const lotes = [];
   for (const c of compras) {
-    const h = await horaDe(c.bloco);
+    const h = horaCache.get(c.bloco) || null;
     lotes.push({
       ts: h ? h.toISOString().slice(0, 16).replace("T", " ") : null,
       endereco: c.quem,
@@ -281,9 +291,15 @@ servidor.listen(PORTA, () => console.log("EHRLICH servindo em :" + PORTA));
 
 /* ------------------------------------------------------------- os relogios */
 async function ciclo() {
-  try { await leChain(); }
-  catch (e) { vivo.chainErro = e.message; console.error("chain:", e.message); }
-  try { custo = (await custoDasPlacas()) || custo; } catch (e) { /* mantem o ultimo */ }
+  // as duas leituras sao independentes: em serie, o custo da placa so aparecia
+  // depois da varredura inteira da chain, e a pagina mostrava travessao
+  const [, c] = await Promise.all([
+    leChain().catch((e) => {
+      vivo.chainErro = e.message; console.error("chain:", e.message);
+    }),
+    custoDasPlacas().catch(() => null),
+  ]);
+  if (c) custo = c;
 }
 ciclo();
 setInterval(ciclo, INTERVALO_CHAIN);
