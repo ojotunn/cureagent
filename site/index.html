@@ -192,6 +192,14 @@
     padding:2px 6px;border-radius:5px;font-size:12.5px}
 
   /* ---------- quem pagou ---------- */
+  @keyframes entrou{from{background:#e6f4f1}to{background:transparent}}
+  tr.novo td{animation:entrou 2.4s ease-out}
+  .pulso{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);
+    font-size:10.5px;text-transform:uppercase;letter-spacing:.09em;color:var(--pass)}
+  .pulso i{width:7px;height:7px;border-radius:50%;background:var(--pass);
+    animation:bate 1.8s ease-in-out infinite}
+  @keyframes bate{0%,100%{opacity:1}50%{opacity:.25}}
+  .pulso.parado{color:var(--dim)} .pulso.parado i{background:var(--dim);animation:none}
   .lote-resumo{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
     gap:12px;margin-bottom:16px}
   .lote-resumo div{background:var(--card);border:1px solid var(--line);
@@ -332,7 +340,7 @@
   </section>
 
   <section id="secLotes">
-    <h2>Who paid for this</h2>
+    <h2>Who paid for this <span class="pulso parado" id="pulso" style="margin-left:10px"><i></i><span>connecting…</span></span></h2>
     <p class="note">Every purchase funds a batch of molecules, screened in the
        name of the address that paid for it. The batch is public the moment it
        runs — here, on the live view above, and in the downloadable data.</p>
@@ -779,8 +787,13 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
       <em>${x.linhas ? fmt(x.linhas) + " rows · " : ""}download</em>
     </a>`).join("");
 
-  /* ---- quem pagou: lotes financiados por compra ---- */
-  fetch("data/lotes.json").then(r => r.json()).then(lt => {
+  /* ---- quem pagou: lotes financiados por compra ----
+     Busca a cada 10s. O agente reescreve data/lotes.json quando um lote roda;
+     a pagina nao precisa de websocket para isso — o arquivo E o canal, e o
+     servidor manda no-store, entao a leitura nunca vem de cache. */
+  let vistos = new Set(), primeiraVez = true;
+
+  function pintaLotes(lt) {
     const lotes = lt.lotes || [], res = lt.resumo || {};
     const trunc = e => (lt.mostrar_endereco === "completo" || !e || e.length < 14)
       ? e : `${e.slice(0, 6)}…${e.slice(-4)}`;
@@ -816,7 +829,40 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
         <td>${l.gpu_min != null ? l.gpu_min + " min" : "—"}</td>
         <td>${l.estado === "running" ? "<span class=\"warnc\">running</span>" : ""}</td>
       </tr>`).join("") + `</tbody></table></div>`;
-  }).catch(() => {});
+
+    // marca como novo o que chegou depois da primeira carga
+    if (!primeiraVez) {
+      for (const l of lotes) {
+        const ch = (l.tx || "") + (l.ts || "") + (l.endereco || "");
+        if (!vistos.has(ch)) {
+          const tr = [...document.querySelectorAll("#loteCorpo tbody tr")]
+            .find(t => t.textContent.includes(trunc(l.endereco)));
+          if (tr) tr.classList.add("novo");
+        }
+      }
+    }
+    lotes.forEach(l => vistos.add((l.tx || "") + (l.ts || "") + (l.endereco || "")));
+    primeiraVez = false;
+  }
+
+  function puxaLotes() {
+    return fetch("data/lotes.json", {cache: "no-store"})
+      .then(r => r.json())
+      .then(lt => {
+        pintaLotes(lt);
+        const p = document.getElementById("pulso");
+        const vivo = lt.modo === "live";
+        p.className = "pulso" + (vivo ? "" : " parado");
+        p.lastElementChild.textContent = vivo ? "live" : "not running";
+      })
+      .catch(() => {
+        const p = document.getElementById("pulso");
+        p.className = "pulso parado";
+        p.lastElementChild.textContent = "offline";
+      });
+  }
+  puxaLotes();
+  setInterval(puxaLotes, 10000);   // 10s: rapido para quem comprou, leve para o servidor
 
   /* ---- contrato, so quando existir de verdade ---- */
   fetch("token.json").then(r => r.json()).then(tk => {
