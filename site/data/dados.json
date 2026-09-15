@@ -137,7 +137,7 @@
   ],
   "chembl_alvo": "CHEMBL3563",
   "recorde_publicado": 4000000,
-  "recorde_fonte": "Largest published virtual screen reported against this target",
+  "recorde_fonte": "A published campaign docked nearly 4 million lead-like and fragment-like compounds against cruzain, which led to reversible carbamoyl imidazole inhibitors (PubMed 31765144).",
   "sitio": {
    "x": 99.125,
    "y": 21.293,
@@ -4118,25 +4118,25 @@
   {
    "fase": 2,
    "nome": "Fair decoys, and a second target evaluated",
-   "custo": "$0",
-   "confianca": "estimated",
-   "base": "a few hours of the same local CPU",
+   "custo": "$1.95",
+   "confianca": "measured",
+   "base": "Measured: one validation round is about 642 dockings (measured inhibitors plus property-matched decoys). This is the cost of putting all seven queued targets through the gate, whether they pass or fail.",
    "estado": "next"
   },
   {
    "fase": 3,
    "nome": "1 million molecules screened",
-   "custo": "$10 – 50",
-   "confianca": "estimated",
-   "base": "GPU rental at $0.34/hour; 0.1–0.3 s per molecule, derived from published Vina-GPU speedups. The first hour of rented GPU replaces this with a measured number.",
+   "custo": "$435",
+   "confianca": "measured",
+   "base": "Measured on the rented pod: 414 molecules per hour on 56 cores at $0.18/hour, which is $0.000435 per molecule. AutoDock Vina is CPU only; moving the docking to the GPU we already rent should cut this sharply, but that is not measured yet and is not assumed here.",
    "estado": "locked"
   },
   {
    "fase": 4,
    "nome": "Beat the largest published screen on this target",
-   "custo": "$30 – 120",
-   "confianca": "estimated",
-   "base": "same basis, about four times the molecules",
+   "custo": "$1,739",
+   "confianca": "measured",
+   "base": "Same measured rate, four million molecules — the size of the largest published screen against this target.",
    "estado": "locked"
   },
   {
@@ -4166,6 +4166,6 @@
  ],
  "roadmap_total": {
   "ate_bancada": "$3,000 – 11,000",
-  "nota": "Everything from an empty screen to a result on a real laboratory bench. The computing is the cheap part — it is the glassware that costs."
+  "nota": "Everything from an empty screen to a result on a real laboratory bench. The computing really is the cheap part: at the rate measured on the rented card, four million molecules cost $1,739. It is the glassware that costs."
  }
 }
