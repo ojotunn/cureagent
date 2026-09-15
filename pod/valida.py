@@ -472,4 +472,16 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as _e:
+        import traceback
+        traceback.print_exc()
+        # a pagina precisa poder dizer o que quebrou, com o nome do erro,
+        # em vez de herdar um palpite sobre cristal ou inibidor
+        try:
+            registra_parada("the validation run crashed: %s: %s"
+                            % (type(_e).__name__, _e))
+        except Exception:
+            pass
+        raise SystemExit(1)
