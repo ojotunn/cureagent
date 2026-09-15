@@ -1,0 +1,65 @@
+[
+ {
+  "id": "tc-tr",
+  "nome": "T. cruzi trypanothione reductase",
+  "doenca": "Chagas disease",
+  "porque": "Deep hydrophobic pocket, organic FAD cofactor, no catalytic metal. The three properties cruzain and CYP51 lacked.",
+  "pdb": "Trypanosoma cruzi trypanothione reductase",
+  "chembl": "trypanothione reductase",
+  "organismo": "Trypanosoma cruzi"
+ },
+ {
+  "id": "tc-gapdh",
+  "nome": "T. cruzi glyceraldehyde-3-phosphate dehydrogenase",
+  "doenca": "Chagas disease",
+  "porque": "NAD cofactor, organic. The parasite depends on glycolysis, and the NAD pocket is enclosed.",
+  "pdb": "Trypanosoma cruzi glyceraldehyde-3-phosphate dehydrogenase",
+  "chembl": "glyceraldehyde-3-phosphate dehydrogenase",
+  "organismo": "Trypanosoma cruzi"
+ },
+ {
+  "id": "tc-dhodh",
+  "nome": "T. cruzi dihydroorotate dehydrogenase",
+  "doenca": "Chagas disease",
+  "porque": "FMN cofactor, organic, no metal. Pyrimidine synthesis the parasite cannot bypass.",
+  "pdb": "Trypanosoma cruzi dihydroorotate dehydrogenase",
+  "chembl": "dihydroorotate dehydrogenase",
+  "organismo": "Trypanosoma cruzi"
+ },
+ {
+  "id": "tb-ptr1",
+  "nome": "T. brucei pteridine reductase 1",
+  "doenca": "Sleeping sickness",
+  "porque": "NADPH cofactor, buried folate site. First target outside Chagas.",
+  "pdb": "Trypanosoma brucei pteridine reductase",
+  "chembl": "pteridine reductase 1",
+  "organismo": "Trypanosoma brucei"
+ },
+ {
+  "id": "lm-ptr1",
+  "nome": "Leishmania major pteridine reductase 1",
+  "doenca": "Leishmaniasis",
+  "porque": "Same enzyme family, different parasite. Tests whether a protocol carries across organisms.",
+  "pdb": "Leishmania pteridine reductase",
+  "chembl": "pteridine reductase 1",
+  "organismo": "Leishmania major"
+ },
+ {
+  "id": "mtb-inha",
+  "nome": "M. tuberculosis enoyl-ACP reductase InhA",
+  "doenca": "Tuberculosis",
+  "porque": "NADH cofactor, deep hydrophobic pocket, no metal. The textbook case for the rule we derived.",
+  "pdb": "Mycobacterium tuberculosis enoyl acyl carrier protein reductase InhA",
+  "chembl": "enoyl-[acyl-carrier-protein] reductase",
+  "organismo": "Mycobacterium tuberculosis"
+ },
+ {
+  "id": "pf-dhodh",
+  "nome": "P. falciparum dihydroorotate dehydrogenase",
+  "doenca": "Malaria",
+  "porque": "FMN cofactor, validated clinically by DSM265. A target where a wrong answer is easy to spot.",
+  "pdb": "Plasmodium falciparum dihydroorotate dehydrogenase",
+  "chembl": "dihydroorotate dehydrogenase",
+  "organismo": "Plasmodium falciparum"
+ }
+]
