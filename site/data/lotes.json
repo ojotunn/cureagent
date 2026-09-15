@@ -1476,12 +1476,12 @@
   "receptor": "PDB 4DSG",
   "gpu": "RTX 4000 SFF Ada",
   "gpu_hora": 0.18,
-  "gpu_gasto_usd": 0.28,
-  "horas": 1.58,
+  "gpu_gasto_usd": 0.29,
+  "horas": 1.61,
   "nucleos": 56,
-  "docadas": 209,
+  "docadas": 220,
   "auc": null,
   "corte": 0.7,
-  "atualizado": "2026-09-15 02:21"
+  "atualizado": "2026-09-15 02:22"
  }
 }
