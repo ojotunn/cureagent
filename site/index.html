@@ -1055,13 +1055,38 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     if (lig && lig.trim()) {
       view.addModel(lig, "pdb");
       temLig = true;
-      view.setStyle({model: 1}, {stick: {radius: 0.26, color: "#c2410c"}});
-      view.addStyle({model: 0, within: {distance: 8, sel: {model: 1}}},
-                    {stick: {radius: 0.15, color: "#0e7c6b"}});
+
+      // O bolso e calculado por DISTANCIA de verdade, a partir do ligante
+      // cristalografico. O seletor within do 3Dmol nao estava pegando nada e a
+      // tela ficava so com a fita: sem o bolso desenhado, nao da para ver que
+      // a molecula entra em algum lugar.
+      const xyzDe = (txt, pre) => {
+        const pts = [];
+        for (const l of txt.split(String.fromCharCode(10))) {
+          if (!pre.some(p => l.startsWith(p))) continue;
+          pts.push([+l.slice(30,38), +l.slice(38,46), +l.slice(46,54),
+                    l.slice(21,22), l.slice(22,26).trim()]);
+        }
+        return pts;
+      };
+      const pl = xyzDe(lig, ["HETATM", "ATOM"]);
+      const pr = xyzDe(rec, ["ATOM"]);
+      const perto = new Set();
+      for (const a of pr) {
+        for (const b of pl) {
+          const dx=a[0]-b[0], dy=a[1]-b[1], dz=a[2]-b[2];
+          if (dx*dx + dy*dy + dz*dz < 64) { perto.add(a[4]); break; }
+        }
+      }
+      const resi = [...perto].map(Number).filter(n => !isNaN(n));
+      if (resi.length) {
+        view.addStyle({model: 0, resi: resi},
+                      {stick: {radius: 0.16, color: "#0e7c6b"}});
+      }
     }
     // enquadra o SITIO, nao a proteina inteira: e ali que o trabalho acontece
     view.zoomTo(temLig ? {model: 1} : {model: 0});
-    view.zoom(temLig ? 0.30 : 1.15);
+    view.zoom(temLig ? 0.55 : 1.15);
     // o ligante de referencia ja serviu (definiu sitio e camera); sai de cena
     // para nao ser confundido com a molecula que esta sendo testada
     if (temLig) view.setStyle({model: 1}, {});
