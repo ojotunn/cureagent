@@ -904,7 +904,7 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
           if (pausa) nPausa.innerHTML =
             `<b>Paused since ${esc(pausa.desde)}.</b> ${esc(pausa.motivo)} ` +
             (pausa.gasto_gpu_usd != null
-              ? `Total rented compute for this run: ${pausa.gasto_gpu_usd.toFixed(2)} over ${(pausa.horas_gpu || 0).toFixed(1)} hours. ` : "") +
+              ? `Total rented compute for this run: $${pausa.gasto_gpu_usd.toFixed(2)} over ${(pausa.horas_gpu || 0).toFixed(1)} hours. ` : "") +
             "The findings below stay published.";
         }
         const ocioso = !mt.estado || mt.estado === "idle";
@@ -991,6 +991,15 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
           }
         }
 
+        // Pausado, o cabecalho voltava a anunciar a campanha arquivada e o
+        // gasto dela, que lido no topo parece o gasto do projeto inteiro.
+        if (pausa) {
+          const st0 = document.getElementById("estado");
+          const tot = fa.length;
+          const testados = fa.filter(a => a.auc != null).length;
+          if (st0) st0.textContent =
+            `paused · ${tot} targets queued, ${testados} reached a full test, none cleared 0.70 · GPU spent $${(pausa.gasto_gpu_usd || 0).toFixed(2)}`;
+        }
         const st = document.getElementById("estado");
         if (st && mt.estado) {
           st.textContent = validando
