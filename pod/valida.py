@@ -276,8 +276,7 @@ def main():
     candidatos = acha_cristal(termo_pdb)
     if not candidatos:
         log("  NENHUM cristal serve — parando"); return
-    log(f"  {len(candidatos)} cristais candidatos
-")
+    log(f"  {len(candidatos)} cristais candidatos")
 
     log("2. preparando receptor")
     rec = centro = tam = None
@@ -294,8 +293,7 @@ def main():
     if not rec:
         log("  nenhum candidato preparou — parando"); return
     log(f"  escolhido {pdb_id}/{code} · caixa centro "
-        f"{[round(v,1) for v in centro]} tamanho {[round(v,1) for v in tam]}
-")
+        f"{[round(v,1) for v in centro]} tamanho {[round(v,1) for v in tam]}")
 
     log("3. inibidores medidos")
     tid, nome, total = alvo_chembl(termo_chembl, organismo)

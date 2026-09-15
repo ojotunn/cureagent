@@ -1,6 +1,6 @@
 {
  "_comentario": "Lotes financiados por compra. O agente escreve aqui: le a compra na chain (publico, sem carteira) e registra o lote que disparou em nome daquele endereco. Vazio ate o token existir.",
- "modo": "parado",
+ "modo": "live",
  "mostrar_endereco": "truncado",
  "atualizado_em": "2026-09-15 00:41",
  "resumo": {
@@ -1468,5 +1468,17 @@
    "estado": "queued"
   }
  ],
- "motor": null
+ "motor": {
+  "estado": "validating",
+  "etapa": "pairing property-matched decoys",
+  "alvo": "T. cruzi trypanothione reductase",
+  "alvo_nota": "Deep hydrophobic pocket, organic FAD cofactor, no catalytic metal — the three properties the two rejected targets lacked.",
+  "receptor": "selecting crystal",
+  "gpu": "RTX 4000 SFF Ada",
+  "nucleos": 56,
+  "docadas": 0,
+  "auc": null,
+  "corte": 0.7,
+  "atualizado": "2026-09-15 01:41"
+ }
 }
