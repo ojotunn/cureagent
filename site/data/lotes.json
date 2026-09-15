@@ -1,6 +1,6 @@
 {
  "_comentario": "Lotes financiados por compra. O agente escreve aqui: le a compra na chain (publico, sem carteira) e registra o lote que disparou em nome daquele endereco. Vazio ate o token existir.",
- "modo": "live",
+ "modo": "parado",
  "mostrar_endereco": "truncado",
  "atualizado_em": "2026-09-15 00:41",
  "resumo": {
@@ -1468,17 +1468,83 @@
    "estado": "queued"
   }
  ],
- "motor": {
-  "estado": "validating",
-  "etapa": "docking actives against decoys",
-  "alvo": "T. cruzi trypanothione reductase",
-  "alvo_nota": "Deep hydrophobic pocket, organic FAD cofactor, no catalytic metal — the three properties the two rejected targets lacked.",
-  "receptor": "selecting crystal",
-  "gpu": "RTX 4000 SFF Ada",
-  "nucleos": 56,
-  "docadas": 390,
-  "auc": null,
-  "corte": 0.7,
-  "atualizado": "2026-09-15 03:25"
+ "motor": null,
+ "fila_alvos": [
+  {
+   "id": "tc-tr",
+   "nome": "T. cruzi trypanothione reductase",
+   "doenca": "Chagas disease",
+   "porque": "Deep hydrophobic pocket, organic FAD cofactor, no catalytic metal. The three properties cruzain and CYP51 lacked.",
+   "auc": null,
+   "estado": "untestable",
+   "motivo": "no PDB entry matched this protein in this organism, or none had a non-covalent drug-like ligand",
+   "pdb": null
+  },
+  {
+   "id": "tc-gapdh",
+   "nome": "T. cruzi glyceraldehyde-3-phosphate dehydrogenase",
+   "doenca": "Chagas disease",
+   "porque": "NAD cofactor, organic. The parasite depends on glycolysis, and the NAD pocket is enclosed.",
+   "auc": null,
+   "estado": "untestable",
+   "motivo": "ChEMBL has 58 measurements for this target but none usable: needs IC50 or Ki in nM, potency under 10 uM, molecular weight under 600 and at most 10 rotatable bonds",
+   "pdb": null
+  },
+  {
+   "id": "tc-dhodh",
+   "nome": "T. cruzi dihydroorotate dehydrogenase",
+   "doenca": "Chagas disease",
+   "porque": "FMN cofactor, organic, no metal. Pyrimidine synthesis the parasite cannot bypass.",
+   "auc": null,
+   "estado": "untestable",
+   "motivo": "no single-protein ChEMBL target for this name in this organism",
+   "pdb": null
+  },
+  {
+   "id": "tb-ptr1",
+   "nome": "T. brucei pteridine reductase 1",
+   "doenca": "Sleeping sickness",
+   "porque": "NADPH cofactor, buried folate site. First target outside Chagas.",
+   "auc": 0.453,
+   "estado": "rejected",
+   "motivo": null,
+   "pdb": "6RX6"
+  },
+  {
+   "id": "lm-ptr1",
+   "nome": "Leishmania major pteridine reductase 1",
+   "doenca": "Leishmaniasis",
+   "porque": "Same enzyme family, different parasite. Tests whether a protocol carries across organisms.",
+   "auc": null,
+   "estado": "untestable",
+   "motivo": "the validation run crashed: BlockingIOError: [Errno 11] Resource temporarily unavailable",
+   "pdb": null
+  },
+  {
+   "id": "mtb-inha",
+   "nome": "M. tuberculosis enoyl-ACP reductase InhA",
+   "doenca": "Tuberculosis",
+   "porque": "NADH cofactor, deep hydrophobic pocket, no metal. The textbook case for the rule we derived.",
+   "auc": 0.49,
+   "estado": "rejected",
+   "motivo": null,
+   "pdb": "5G0T"
+  },
+  {
+   "id": "pf-dhodh",
+   "nome": "P. falciparum dihydroorotate dehydrogenase",
+   "doenca": "Malaria",
+   "porque": "FMN cofactor, validated clinically by DSM265. A target where a wrong answer is easy to spot.",
+   "auc": 0.678,
+   "estado": "rejected",
+   "motivo": null,
+   "pdb": "6I55"
+  }
+ ],
+ "pausado": {
+  "desde": "2026-09-15 20:12 UTC",
+  "motivo": "The card was released. The queue of targets had been worked through and nothing cleared the gate, so there was no funded screening to keep a rented card busy for.",
+  "gasto_gpu_usd": 3.49,
+  "horas_gpu": 19.41
  }
 }

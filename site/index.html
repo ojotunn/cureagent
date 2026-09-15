@@ -347,6 +347,9 @@
        runs — here, on the live view above, and in the downloadable data.</p>
     <div class="lote-resumo" id="motorCaixa" hidden style="margin-top:16px"></div>
     <p class="note" id="motorNota" hidden style="margin-top:8px"></p>
+    <p class="note" id="avisoPausa" hidden
+       style="margin-top:14px;padding:12px 14px;border:1px solid var(--line);
+              border-radius:8px;background:var(--card)"></p>
     <div id="filaAlvos" hidden style="margin-top:22px">
       <h3 style="font-size:14px;letter-spacing:.08em;text-transform:uppercase;
                  color:var(--fraco);font-weight:600;margin:0 0 4px">The queue of targets</h3>
@@ -892,6 +895,18 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
           : `${mt.gpu || "GPU"} · ${mt.nucleos || "?"} cores`;
         // "idle" existe de verdade: a fila de alvos acabou e a placa parou.
         // Chamar isso de screening seria a pagina afirmar trabalho que nao ha.
+        // A placa foi devolvida: a pagina diz isso com data e custo, em vez de
+        // deixar a pessoa adivinhar por que nada se mexe.
+        const pausa = lt.pausado;
+        const nPausa = document.getElementById("avisoPausa");
+        if (nPausa) {
+          nPausa.hidden = !pausa;
+          if (pausa) nPausa.innerHTML =
+            `<b>Paused since ${esc(pausa.desde)}.</b> ${esc(pausa.motivo)} ` +
+            (pausa.gasto_gpu_usd != null
+              ? `Total rented compute for this run: ${pausa.gasto_gpu_usd.toFixed(2)} over ${(pausa.horas_gpu || 0).toFixed(1)} hours. ` : "") +
+            "The findings below stay published.";
+        }
         const ocioso = !mt.estado || mt.estado === "idle";
         p.lastElementChild.textContent = !vivo ? "not running"
           : ocioso ? `idle ${esc(mt.etapa || "between targets")}`

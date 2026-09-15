@@ -234,6 +234,8 @@ function montaLotes() {
     },
     motor: m,
     fila_alvos: (fresco && vivo.motor.fila_alvos) || disco.fila_alvos || null,
+    // quando a placa foi devolvida, o arquivo em disco carrega o porque
+    pausado: m ? null : (disco.pausado || null),
     lotes,
   };
 }
