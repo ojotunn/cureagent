@@ -21,7 +21,7 @@
    "ts": "2026-09-14 01:39",
    "tipo": "validation",
    "titulo": "Pose reproduction failed on this target",
-   "corpo": "Every non-covalent crystal ligand available for this target was docked back into its own structure. None was placed correctly as the top answer \u2014 including a ligand with zero rotatable bonds, which is the easiest case there is. Scoring the true crystal pose gives a worse number than the wrong poses: the shallow, open cleft of this protein is not something this scoring function reads well.",
+   "corpo": "Every non-covalent crystal ligand available for this target was docked back into its own structure. None was placed correctly as the top answer — including a ligand with zero rotatable bonds, which is the easiest case there is. Scoring the true crystal pose gives a worse number than the wrong poses: the shallow, open cleft of this protein is not something this scoring function reads well.",
    "numeros": [
     [
      "top pose within 2.0 A",
@@ -58,7 +58,7 @@
   {
    "ts": "2026-09-14 02:14",
    "tipo": "screening",
-   "titulo": "639 molecules docked \u2014 enrichment measured",
+   "titulo": "639 molecules docked — enrichment measured",
    "corpo": "Measured inhibitors were mixed with property-matched decoys and the whole set was docked blind. The question was whether the real ones come out on top. The pass mark of 0.70 was written down before the run, not after seeing the result.",
    "numeros": [
     [
@@ -144,16 +144,16 @@
    "z": -15.633
   },
   "caixa": [
-   20.0,
-   20.0,
-   20.0
+   20,
+   20,
+   20
   ],
   "estado": "rejected",
-  "estado_nota": "Failed the enrichment threshold (AUC 0.638, cutoff 0.70) and failed pose reproduction on all 7 crystal ligands. Shallow, open cleft typical of cysteine proteases."
+  "estado_nota": "Failed the enrichment threshold (AUC 0.638, cutoff 0.70) and failed pose reproduction on all 5 crystal ligands redocked, from 4 structures, judged on the best of 9 poses at 2.0 A. Shallow, open cleft typical of cysteine proteases."
  },
  "triagem": {
   "moleculas_triadas": 639,
-  "custo_gpu_usd": 0.0,
+  "custo_gpu_usd": 0,
   "onde_rodou": "16 local CPU cores",
   "minutos": 61,
   "ranking": [
@@ -173,7 +173,7 @@
     "id": "CHEMBL5076256",
     "score": -7.86,
     "tipo": "active",
-    "nM": 49.0
+    "nM": 49
    },
    {
     "id": "CHEMBL12801",
@@ -221,13 +221,13 @@
     "id": "CHEMBL5084365",
     "score": -7.5,
     "tipo": "active",
-    "nM": 47.0
+    "nM": 47
    },
    {
     "id": "CHEMBL556465",
     "score": -7.46,
     "tipo": "active",
-    "nM": 200.0
+    "nM": 200
    },
    {
     "id": "CHEMBL276206",
@@ -371,7 +371,7 @@
     "id": "CHEMBL3233094",
     "score": -7.16,
     "tipo": "active",
-    "nM": 8200.0
+    "nM": 8200
    },
    {
     "id": "CHEMBL6321",
@@ -413,7 +413,7 @@
     "id": "CHEMBL105708",
     "score": -7.08,
     "tipo": "active",
-    "nM": 274.0
+    "nM": 274
    },
    {
     "id": "CHEMBL3907022",
@@ -447,19 +447,19 @@
    },
    {
     "id": "CHEMBL12533",
-    "score": -7.0,
+    "score": -7,
     "tipo": "decoy",
     "nM": null
    },
    {
     "id": "CHEMBL267228",
-    "score": -7.0,
+    "score": -7,
     "tipo": "decoy",
     "nM": null
    },
    {
     "id": "CHEMBL7939",
-    "score": -7.0,
+    "score": -7,
     "tipo": "decoy",
     "nM": null
    },
@@ -515,7 +515,7 @@
     "id": "CHEMBL1079068",
     "score": -6.94,
     "tipo": "active",
-    "nM": 6000.0
+    "nM": 6000
    },
    {
     "id": "CHEMBL17500",
@@ -575,7 +575,7 @@
     "id": "CHEMBL578161",
     "score": -6.87,
     "tipo": "active",
-    "nM": 1410.0
+    "nM": 1410
    },
    {
     "id": "CHEMBL6348",
@@ -599,7 +599,7 @@
     "id": "CHEMBL2402103",
     "score": -6.85,
     "tipo": "active",
-    "nM": 1200.0
+    "nM": 1200
    },
    {
     "id": "CHEMBL4522247",
@@ -683,7 +683,7 @@
     "id": "CHEMBL567783",
     "score": -6.81,
     "tipo": "active",
-    "nM": 1.0
+    "nM": 1
    },
    {
     "id": "CHEMBL276014",
@@ -851,7 +851,7 @@
     "id": "CHEMBL4857068",
     "score": -6.73,
     "tipo": "active",
-    "nM": 10000.0
+    "nM": 10000
    },
    {
     "id": "CHEMBL12656",
@@ -875,7 +875,7 @@
     "id": "CHEMBL6175693",
     "score": -6.72,
     "tipo": "active",
-    "nM": 28.0
+    "nM": 28
    },
    {
     "id": "CHEMBL11088",
@@ -935,7 +935,7 @@
     "id": "CHEMBL1078981",
     "score": -6.69,
     "tipo": "active",
-    "nM": 5000.0
+    "nM": 5000
    },
    {
     "id": "CHEMBL14157",
@@ -989,7 +989,7 @@
     "id": "CHEMBL568171",
     "score": -6.66,
     "tipo": "active",
-    "nM": 4.0
+    "nM": 4
    },
    {
     "id": "CHEMBL12834",
@@ -1037,7 +1037,7 @@
     "id": "CHEMBL3329519",
     "score": -6.62,
     "tipo": "active",
-    "nM": 40.0
+    "nM": 40
    },
    {
     "id": "CHEMBL17334",
@@ -1121,7 +1121,7 @@
     "id": "CHEMBL3329520",
     "score": -6.57,
     "tipo": "active",
-    "nM": 4800.0
+    "nM": 4800
    },
    {
     "id": "CHEMBL6336",
@@ -1181,7 +1181,7 @@
     "id": "CHEMBL566924",
     "score": -6.52,
     "tipo": "active",
-    "nM": 2.0
+    "nM": 2
    },
    {
     "id": "CHEMBL7809",
@@ -1241,7 +1241,7 @@
     "id": "CHEMBL567147",
     "score": -6.49,
     "tipo": "active",
-    "nM": 30.0
+    "nM": 30
    },
    {
     "id": "CHEMBL267303",
@@ -1373,7 +1373,7 @@
     "id": "CHEMBL567785",
     "score": -6.42,
     "tipo": "active",
-    "nM": 2.0
+    "nM": 2
    },
    {
     "id": "CHEMBL12290",
@@ -1751,7 +1751,7 @@
     "id": "CHEMBL567340",
     "score": -6.28,
     "tipo": "active",
-    "nM": 1.0
+    "nM": 1
    },
    {
     "id": "CHEMBL267628",
@@ -2225,7 +2225,7 @@
     "id": "CHEMBL1290191",
     "score": -6.09,
     "tipo": "active",
-    "nM": 2.0
+    "nM": 2
    },
    {
     "id": "CHEMBL6265",
@@ -2397,25 +2397,25 @@
    },
    {
     "id": "CHEMBL12909",
-    "score": -6.0,
+    "score": -6,
     "tipo": "decoy",
     "nM": null
    },
    {
     "id": "CHEMBL283340",
-    "score": -6.0,
+    "score": -6,
     "tipo": "decoy",
     "nM": null
    },
    {
     "id": "CHEMBL9152",
-    "score": -6.0,
+    "score": -6,
     "tipo": "decoy",
     "nM": null
    },
    {
     "id": "CHEMBL9662",
-    "score": -6.0,
+    "score": -6,
     "tipo": "decoy",
     "nM": null
    },
@@ -3131,7 +3131,7 @@
     "id": "CHEMBL567137",
     "score": -5.71,
     "tipo": "active",
-    "nM": 890.0
+    "nM": 890
    },
    {
     "id": "CHEMBL7807",
@@ -3215,7 +3215,7 @@
     "id": "CHEMBL182790",
     "score": -5.62,
     "tipo": "active",
-    "nM": 30.0
+    "nM": 30
    },
    {
     "id": "CHEMBL12434",
@@ -3813,7 +3813,7 @@
    },
    {
     "id": "CHEMBL429009",
-    "score": -5.0,
+    "score": -5,
     "tipo": "decoy",
     "nM": null
    },
@@ -3983,7 +3983,7 @@
     "id": "CHEMBL90181",
     "score": -4.44,
     "tipo": "active",
-    "nM": 1900.0
+    "nM": 1900
    },
    {
     "id": "CHEMBL278257",
@@ -4003,9 +4003,9 @@
    "n_decoys": 590,
    "exhaustiveness": 8,
    "caixa": [
-    20.0,
-    20.0,
-    20.0
+    20,
+    20,
+    20
    ]
   },
   "pose": [
@@ -4109,7 +4109,7 @@
   },
   {
    "fase": 1,
-   "nome": "Target validation \u2014 enrichment and pose",
+   "nome": "Target validation — enrichment and pose",
    "custo": "$0",
    "confianca": "measured",
    "base": "639 dockings, 61 minutes on 16 local cores",
@@ -4126,15 +4126,15 @@
   {
    "fase": 3,
    "nome": "1 million molecules screened",
-   "custo": "$10 \u2013 50",
+   "custo": "$10 – 50",
    "confianca": "estimated",
-   "base": "GPU rental at $0.34/hour; 0.1\u20130.3 s per molecule, derived from published Vina-GPU speedups. The first hour of rented GPU replaces this with a measured number.",
+   "base": "GPU rental at $0.34/hour; 0.1–0.3 s per molecule, derived from published Vina-GPU speedups. The first hour of rented GPU replaces this with a measured number.",
    "estado": "locked"
   },
   {
    "fase": 4,
    "nome": "Beat the largest published screen on this target",
-   "custo": "$30 \u2013 120",
+   "custo": "$30 – 120",
    "confianca": "estimated",
    "base": "same basis, about four times the molecules",
    "estado": "locked"
@@ -4142,30 +4142,30 @@
   {
    "fase": 5,
    "nome": "Buy the 20 best compounds",
-   "custo": "$1,000 \u2013 3,000",
+   "custo": "$1,000 – 3,000",
    "confianca": "unquoted",
-   "base": "made-to-order synthesis, roughly three weeks. No supplier has quoted us yet \u2014 this is an order of magnitude, not a price.",
+   "base": "made-to-order synthesis, roughly three weeks. No supplier has quoted us yet — this is an order of magnitude, not a price.",
    "estado": "locked"
   },
   {
    "fase": 6,
    "nome": "Enzyme assay in a real laboratory",
-   "custo": "$2,000 \u2013 8,000",
+   "custo": "$2,000 – 8,000",
    "confianca": "unquoted",
    "base": "does the molecule actually block the protein? Needs a laboratory to quote it; a conversation, not a web search.",
    "estado": "locked"
   },
   {
    "fase": 7,
-   "nome": "Cell assay \u2014 parasite killed, human cells spared",
-   "custo": "$5,000 \u2013 15,000",
+   "nome": "Cell assay — parasite killed, human cells spared",
+   "custo": "$5,000 – 15,000",
    "confianca": "unquoted",
    "base": "the last rung this project can reach on its own",
    "estado": "locked"
   }
  ],
  "roadmap_total": {
-  "ate_bancada": "$3,000 \u2013 11,000",
-  "nota": "Everything from an empty screen to a result on a real laboratory bench. The computing is the cheap part \u2014 it is the glassware that costs."
+  "ate_bancada": "$3,000 – 11,000",
+  "nota": "Everything from an empty screen to a result on a real laboratory bench. The computing is the cheap part — it is the glassware that costs."
  }
 }

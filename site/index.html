@@ -689,12 +689,17 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     ? `target ${alvo.nome} · validation ${(alvo.estado || "unknown").toUpperCase()} · GPU spent $${(t.custo_gpu_usd ?? 0).toFixed(2)}`
     : "no target selected yet · nothing screened";
 
+  // Estes dois numeros saem da TABELA que a pagina publica, nao da lista de
+  // PDBs do arquivo de configuracao. A pagina dizia 7 ligantes enquanto a
+  // tabela mostrava 5: quem conferisse pegaria o projeto exagerando.
+  const redocks = (v.pose || []).filter(p => String(p.tipo).toUpperCase() === "REDOCK");
+  const estruturas = new Set(redocks.map(p => String(p.caso).split("_")[0])).size;
   $("#nums").innerHTML = [
     [fmt(t.moleculas_triadas), "molecules docked", t.onde_rodou || ""],
     ["$" + (t.custo_gpu_usd ?? 0).toFixed(2), "spent on GPU", "that campaign ran on local CPU, before the rented pod"],
     [enr.auc ? enr.auc.toFixed(3) : "—", "enrichment AUC", "0.50 = coin flip · 0.70 = useful"],
-    [fmt((alvo.pdb_validacao || []).length + (alvo.pdb_triagem ? 1 : 0)),
-     "crystal structures analysed", "every one checked for covalent ligands first"],
+    [fmt(redocks.length), "crystal ligands redocked",
+     `from ${estruturas} structures · each checked for covalent links first`],
   ].map(([b, s, sm]) => `<div class="num"><b>${b}</b><span>${s}</span><small>${sm}</small></div>`).join("");
 
   const temAlvo = !!(alvo && alvo.nome);
@@ -712,7 +717,7 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     <p class="note">${alvo.doenca_nota || ""}</p>
     <div class="kv"><span>disease</span><b>${alvo.doenca || "—"}</b></div>
     <div class="kv"><span>screening structure</span><b>PDB ${alvo.pdb_triagem || "—"}</b></div>
-    <div class="kv"><span>structures analysed</span><b>${alvo.pdb_validacao ? alvo.pdb_validacao.length + 1 : "—"}</b></div>
+    <div class="kv"><span>structures examined</span><b>${alvo.pdb_validacao ? alvo.pdb_validacao.length + 1 : "—"}</b></div>
     <div class="kv"><span>measured inhibitors</span><b>${alvo.chembl_alvo || "—"}</b></div>
     <div class="kv"><span>largest published screen</span><b>${fmt(alvo.recorde_publicado)}</b></div>`;
   $("#rejeicao").textContent = alvo.estado_nota || "";
