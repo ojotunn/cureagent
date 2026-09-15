@@ -108,6 +108,12 @@ const ETAPAS = [
   [/resultado/i,            "computing enrichment"],
 ];
 
+// o cristal escolhido sai do proprio log do validador, nao de um palpite meu
+function cristalDoLog(log) {
+  const m = log.match(new RegExp("escolhido ([A-Za-z0-9]+)/([A-Za-z0-9]+)"));
+  return m ? { pdb: m[1], ligante: m[2] } : null;
+}
+
 function etapaDoLog(log) {
   const linhas = log.split("\n").map((l) => l.trim()).filter(Boolean);
   for (let i = linhas.length - 1; i >= 0; i--) {
@@ -126,7 +132,8 @@ function montaMotor(d, custo) {
       alvo: "T. cruzi trypanothione reductase",
       alvo_nota: "Deep hydrophobic pocket, organic FAD cofactor, no catalytic " +
                  "metal — the three properties the two rejected targets lacked.",
-      receptor: r ? `PDB ${r.pdb}` : "selecting crystal",
+      receptor: r ? `PDB ${r.pdb}`
+               : (cristalDoLog(d.log) ? `PDB ${cristalDoLog(d.log).pdb}` : "selecting crystal"),
       gpu: GPU,
       gpu_hora: custo ? Number(custo.hora.toFixed(2)) : null,
       gpu_gasto_usd: custo ? Number(custo.gasto.toFixed(2)) : null,
