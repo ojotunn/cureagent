@@ -12,7 +12,34 @@ mkdir -p out out/alvos target prod/ligs docked ligs
 reg() { echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) $*" >> /work/out/ciclo.log; }
 
 # se ja existe um validador lancado a mao, respeita e espera terminar
+# ADOCAO: se um validador foi lancado a mao (foi o caso do primeiro alvo) e
+# deixou resultado, esse trabalho entra na fila como resultado do primeiro
+# candidato ainda sem veredicto. Sem isto o ciclo recomecaria a mesma
+# validacao do zero e jogaria fora horas de placa.
+adota() {
+  python - <<'PY'
+import json, os, shutil
+if not os.path.exists("/work/out/resultado.json"):
+    raise SystemExit(0)
+alvos = json.load(open("/work/alvos.json"))
+pasta = "/work/out/alvos"
+os.makedirs(pasta, exist_ok=True)
+alvo = next((a for a in alvos
+             if not os.path.exists(os.path.join(pasta, a["id"] + ".json"))), None)
+if alvo is None:
+    raise SystemExit(0)
+r = json.load(open("/work/out/resultado.json"))
+r["id"] = alvo["id"]
+json.dump(r, open(os.path.join(pasta, alvo["id"] + ".json"), "w"), indent=1)
+if (r.get("auc") or 0) >= 0.70 and os.path.exists("/work/target/alvo.json"):
+    shutil.copy("/work/target/alvo.json", "/work/target/aprovado.json")
+print("adotado: " + alvo["id"])
+PY
+}
+
 while pgrep -f "[v]alida\.py" > /dev/null; do sleep 30; done
+adota >> /work/out/ciclo.log 2>&1
+
 
 while true; do
   D=$(python /work/proximo_alvo.py 2>/dev/null)
