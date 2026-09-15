@@ -44,6 +44,7 @@ function leJSON(p, padrao) {
 /* ------------------------------------------------ estado vivo, em memoria */
 const vivo = {
   compras: null,        // lista crua vinda da chain
+  desdeBloco: null,     // bloco mais antigo com compra, para a janela nao rolar
   motor: null,          // ultimo estado empurrado pela placa
   motorEm: 0,           // quando chegou (ms)
   chainEm: 0,
@@ -73,16 +74,59 @@ async function leChain() {
   if (!tk.curva) throw new Error("token.json sem curva");
 
   const fim = await blocoAtual();
-  const de = Math.max(0, fim - 200000);
+  // A janela era rolante (fim - 200000). Conforme a chain avanca, compras
+  // antigas saiam pela tras da janela e sumiam da fila sem aviso. O inicio
+  // agora fica preso no bloco mais antigo ja visto.
+  const de = vivo.desdeBloco != null
+    ? vivo.desdeBloco
+    : Math.max(0, fim - 200000);
+
   const FATIA = 50000;
   const eventos = [];
+  let falhas = 0;
   for (let b = de; b <= fim; b += FATIA) {
     const ate = Math.min(b + FATIA - 1, fim);
-    try { eventos.push(...await negociacoes(tk.curva, b, ate)); }
-    catch (e) { console.error("fatia " + b + "-" + ate + ": " + e.message); }
+    let ok = false;
+    // uma fatia que falha levava junto TODAS as compras daquele intervalo, e o
+    // resultado parcial ia para a pagina como se fosse a fila inteira
+    for (let tentativa = 0; tentativa < 3 && !ok; tentativa++) {
+      try {
+        eventos.push(...await negociacoes(tk.curva, b, ate));
+        ok = true;
+      } catch (e) {
+        if (tentativa === 2) {
+          falhas++;
+          console.error("fatia " + b + "-" + ate + " desistiu: " + e.message);
+        } else {
+          await new Promise((r) => setTimeout(r, 1500 * (tentativa + 1)));
+        }
+      }
+    }
+  }
+
+  if (falhas) {
+    vivo.chainErro = falhas + " fatia(s) da chain falharam; fila anterior mantida";
+    vivo.chainEm = Date.now();
+    // sem fila anterior nao ha o que manter, mas tambem nao se publica um
+    // numero que sabemos estar incompleto
+    console.error(vivo.chainErro);
+    return;
   }
 
   const compras = eventos.filter((e) => e.tipo === "compra");
+  if (compras.length) {
+    const menor = Math.min(...compras.map((c) => c.bloco));
+    if (vivo.desdeBloco == null || menor < vivo.desdeBloco) vivo.desdeBloco = menor;
+  }
+  // uma varredura completa que devolve menos compras que a anterior significa
+  // que a chain respondeu de forma inconsistente: nao se apaga fila com isso
+  if (vivo.compras && compras.length < vivo.compras.length) {
+    vivo.chainErro = "varredura devolveu " + compras.length + " compras contra " +
+                     vivo.compras.length + " anteriores; fila anterior mantida";
+    vivo.chainEm = Date.now();
+    console.error(vivo.chainErro);
+    return;
+  }
   await carregaHoras(compras.map((c) => c.bloco));
   const lotes = [];
   for (const c of compras) {
@@ -254,6 +298,7 @@ const servidor = http.createServer(async (req, res) => {
       compras: vivo.compras ? vivo.compras.length : null,
       motor_recebido_ha_s: vivo.motorEm ? Math.round((Date.now() - vivo.motorEm) / 1000) : null,
       motor_estado: vivo.motor ? vivo.motor.estado : null,
+      desde_bloco: vivo.desdeBloco,
       placas: custo ? custo.placas : null,
       chain_erro: vivo.chainErro,
     };
