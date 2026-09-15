@@ -880,8 +880,13 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
         p.className = "pulso" + (vivo ? "" : " parado");
         const mt = lt.motor || {};
         const validando = mt.estado === "validating";
+        // quantas placas, dito de forma que nao infle: 1 e "1x", nao "a fleet"
+        const placas = mt.placas || (mt.gpu ? 1 : 0);
+        const frota = placas > 1
+          ? `${placas}× ${mt.gpu || "GPU"} · ${fmt((mt.nucleos || 0) * placas)} cores`
+          : `${mt.gpu || "GPU"} · ${mt.nucleos || "?"} cores`;
         p.lastElementChild.textContent = vivo
-          ? `${validando ? "validating" : "screening"} on ${mt.gpu || "GPU"} · ${mt.nucleos || "?"} cores`
+          ? `${validando ? "validating" : "screening"} on ${frota}`
           : "not running";
         const cx = document.getElementById("motorCaixa");
         const nt = document.getElementById("motorNota");
@@ -905,8 +910,9 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
               const partes = [];
               if (mt.etapa) partes.push(`Right now: ${esc(mt.etapa)}.`);
               if (mt.gpu) partes.push(
-                `Running on a rented ${esc(mt.gpu)} (${mt.nucleos || "?"} cores) ` +
-                `at ${(mt.gpu_hora || 0).toFixed(2)}/hour, ${(mt.horas || 0).toFixed(1)}h so far.`);
+                `Hardware: ${placas > 1 ? placas + " rented cards" : "one rented card"}, ` +
+                `${esc(mt.gpu)}, ${fmt((mt.nucleos || 0) * Math.max(placas, 1))} cores in total, ` +
+                `$${(mt.gpu_hora || 0).toFixed(2)}/hour combined, ${(mt.horas || 0).toFixed(1)}h elapsed.`);
               if (validando) partes.push(
                 "This is the quality gate, not the funded search. No batch is " +
                 "spent on a target until it clears AUC-ROC 0.70 against " +
