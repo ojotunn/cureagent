@@ -263,9 +263,10 @@
       </div>
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <a id="linkX" href="#" target="_blank" rel="noopener" hidden
-           style="font-family:var(--mono);font-size:12.5px;color:var(--accent);
-                  text-decoration:none;border:1px solid var(--line);border-radius:999px;
-                  padding:6px 13px;background:var(--card)"></a>
+           aria-label="X" title="X"
+           style="display:inline-flex;align-items:center;justify-content:center;
+                  width:34px;height:34px;border-radius:50%;border:1px solid var(--line);
+                  background:var(--card);color:var(--ink);text-decoration:none"></a>
         <div class="state"><span class="dot"></span><span id="estado">loading…</span></div>
       </div>
     </div>
@@ -869,7 +870,11 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     if (tk && tk.x) {
       const a = document.getElementById("linkX");
       a.href = tk.x;
-      a.textContent = tk.x_handle || "X";
+      a.innerHTML = `<svg viewBox="0 0 24 24" width="15" height="15"
+        fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227
+        8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254
+        2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`;
+      a.title = tk.x_handle || "X";
       a.hidden = false;
       document.getElementById("rodapeX").innerHTML =
         `Updates: <a href="${esc(tk.x)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(tk.x_handle || tk.x)}</a>`;
