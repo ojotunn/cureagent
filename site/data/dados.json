@@ -4167,5 +4167,10 @@
  "roadmap_total": {
   "ate_bancada": "$3,000 – 11,000",
   "nota": "Everything from an empty screen to a result on a real laboratory bench. The computing really is the cheap part: at the rate measured on the rented card, four million molecules cost $1,739. It is the glassware that costs."
+ },
+ "compute": {
+  "gasto_total_usd": 3.49,
+  "horas": 19.4,
+  "nota": "Rented compute paid for so far, across every run. The first campaign ran on a local CPU at no cost; the seven-target run of 15/09/2026 cost this."
  }
 }
