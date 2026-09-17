@@ -429,6 +429,19 @@
   .sobretitulo b{color:var(--tan);font-weight:500}
   /* as secoes internas herdam o mesmo tom de rotulo */
   h2{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;font-weight:500}
+  /* ---------- a pagina e inteira, sem cartao flutuando ---------- */
+  body{background:#fbfcfd;background-image:none;padding:0}
+  .shell{max-width:none;margin:0;background:#fff;border-radius:0;
+    box-shadow:none;min-height:100vh}
+  .pad{max-width:1180px;margin-inline:auto;
+    padding-inline:clamp(20px,5vw,56px)}
+  /* a faixa de topo ganha um fio, para separar sem precisar de sombra */
+  .bar{border-bottom:1px solid var(--line2)}
+  /* as areas de fundo alternado passam a sangrar a largura toda, com o
+     conteudo ainda centrado por dentro */
+  .fichas-area{background:#f6f8fb;border-block:1px solid var(--line2)}
+  #tab-lab,#tab-results,#tab-road{max-width:1180px;margin-inline:auto}
+  footer{border-top:1px solid var(--line2);background:#f6f8fb}
 </style>
 </head>
 <body>
@@ -1449,7 +1462,7 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     fetch("data/site_ref.pdb").then(r => r.text()).catch(() => null),
   ]).then(([rec, lig]) => {
     view.addModel(rec, "pdb");
-    view.setStyle({model: 0}, {cartoon: {color: "#7d8a96", opacity: 0.55}});
+    view.setStyle({model: 0}, {cartoon: {color: "#8d9aa8", opacity: 0.95}});
     let temLig = false;
     if (lig && lig.trim()) {
       view.addModel(lig, "pdb");
@@ -1480,12 +1493,15 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
       const resi = [...perto].map(Number).filter(n => !isNaN(n));
       if (resi.length) {
         view.addStyle({model: 0, resi: resi},
-                      {stick: {radius: 0.13, color: "#0e7c6b"}});
+                      {stick: {radius: 0.11, color: "#0e7c6b", opacity: 0.85}});
       }
     }
     // enquadra o SITIO, nao a proteina inteira: e ali que o trabalho acontece
     view.zoomTo(temLig ? {model: 1} : {model: 0});
-    view.zoom(temLig ? 0.55 : 1.15);
+    // enquadra a proteina INTEIRA, nao so o bolso: era isso que fazia a
+    // molecula cinza desaparecer, sobrando so o verde dos residuos
+    view.zoomTo({model: 0});
+    view.zoom(1.05);
     // o ligante de referencia ja serviu (definiu sitio e camera); sai de cena
     // para nao ser confundido com a molecula que esta sendo testada
     if (temLig) view.setStyle({model: 1}, {});
@@ -1538,7 +1554,7 @@ function tocaPoses(view, indiceModelo) {
       if (modelo !== null) view.removeModel(modelo);
       modelo = view.addModel(txt, "xyz");
       view.setStyle({model: modelo},
-                    {stick: {radius: 0.21, colorscheme: "orangeCarbon"}});
+                    {stick: {radius: 0.28, colorscheme: "orangeCarbon"}});
       view.render();
 
       document.getElementById("npId").textContent = p.id;
