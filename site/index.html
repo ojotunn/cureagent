@@ -461,6 +461,9 @@
     .palcoDuplo{grid-template-columns:1fr}
     .diario{max-height:260px}
   }
+  .ladoVisor{display:flex;flex-direction:column;min-width:0}
+  .ladoVisor .viewport{flex:1;min-height:0}
+  .secVisor #viewer{height:100%;min-height:clamp(340px,54vh,600px)}
 </style>
 </head>
 <body>
@@ -692,6 +695,7 @@
   <section class="secVisor">
     <h2>The agent at work <span class="pulso parado" id="pulsoLab" style="margin-left:10px"><i></i><span></span></span></h2>
     <div class="palcoDuplo">
+      <div class="ladoVisor">
     <div class="viewport">
     <div id="viewer"><div class="fallback">loading structure…</div></div>
     <div class="np" hidden id="np">
@@ -713,6 +717,7 @@
     <span><i style="background:#c2410c"></i>molecule being tested</span>
     <span id="dica"></span>
     </div>
+      </div>
       <aside class="diario">
         <p class="diario-tit">What the agent is doing</p>
         <ol id="diarioLista"></ol>
