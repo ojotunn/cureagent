@@ -1003,10 +1003,10 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
   const estruturas = new Set(redocks.map(p => String(p.caso).split("_")[0])).size;
   $("#nums").innerHTML = [
     [fmt(t.moleculas_triadas), "molecules docked", t.onde_rodou || ""],
-    ["$" + (t.custo_gpu_usd ?? 0).toFixed(2), "spent on GPU", "that campaign ran on local CPU, before the rented pod"],
+    ["$" + (t.custo_gpu_usd ?? 0).toFixed(2), "spent on rented compute", "nothing has been rented under this launch yet"],
     [enr.auc ? enr.auc.toFixed(3) : "—", "enrichment AUC", "0.50 = coin flip · 0.70 = useful"],
     [fmt(redocks.length), "crystal ligands redocked",
-     `from ${estruturas} structures · each checked for covalent links first`],
+     redocks.length ? `from ${estruturas} structures · each checked for covalent links first` : "pose reproduction has not been run under this launch"],
   ].map(([b, s, sm]) => `<div class="num"><b>${b}</b><span>${s}</span><small>${sm}</small></div>`).join("");
 
   const temAlvo = !!(alvo && alvo.nome);
@@ -1032,10 +1032,10 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
   // Este bloco e o REGISTRO PUBLICADO, nao o que a placa faz agora. Enquanto o
   // alvo do registro estiver reprovado, dizer "na bancada" aqui e mentira: a
   // bancada esta no cabecalho e no painel do motor, alimentados pela placa.
-  if (alvo.estado === "rejected") {
+  if (alvo.arquivado || alvo.estado === "rejected") {
     const tf = $("#tituloFeito"), ta = $("#tituloAlvo");
-    if (tf) tf.textContent = "Published campaign: " + (alvo.nome || "previous target");
-    if (ta) ta.textContent = "The published record — this target was rejected";
+    if (tf) tf.textContent = "Work done so far";
+    if (ta) ta.textContent = "Archived structure, replayed above";
   }
 
   const ctrl = v.controle_positivo || [];
