@@ -22,6 +22,9 @@
 <meta name="twitter:title" content="Ehrlich">
 <meta name="twitter:description" content="Open computational screening for neglected diseases. Every run published.">
 <meta name="twitter:image" content="https://ehrlich.bio/brand/capa.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
   :root{
     --paper:#fbfbfa; --card:#ffffff; --line:#e4e6e4; --line2:#f0f1ef;
@@ -253,17 +256,19 @@
 
   /* ===================== visual novo (referencia) ===================== */
   :root{
-    --ground-1:#7fb0b8; --ground-2:#cfe1ea; --ground-3:#eceaf6;
+    --ground-1:#aecdd4; --ground-2:#dce8ef; --ground-3:#eeeef7;
     --shell:#ffffff; --shell-2:#f5f7fc;
     --ink:#10131a; --ink2:#3b434f; --dim:#6b7683;
     --line:#e7ebf1; --line2:#f1f4f8;
     --tan:#c9a97f; --tan-ink:#1b1712;
     --panel-1:#dbe8f2; --panel-2:#eef1f8;
-    --sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,sans-serif;
+    --sans:"Inter","Segoe UI",system-ui,-apple-system,Roboto,Helvetica,sans-serif;
+    --display:"Inter Tight","Inter",system-ui,-apple-system,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   body{
     background-color:var(--ground-2);
-    background-image:linear-gradient(170deg,var(--ground-1) 0%,var(--ground-2) 26%,var(--ground-3) 62%,var(--ground-3) 100%);
+    background-image:linear-gradient(168deg,var(--ground-1) 0%,var(--ground-2) 18%,var(--ground-3) 48%,var(--ground-3) 100%);
     background-attachment:fixed;background-size:cover;background-repeat:no-repeat;
     padding:clamp(10px,2.4vw,30px);
     line-height:1.55;
@@ -394,6 +399,18 @@
     .secVisor .np-bar{width:64px}
     .legend{font-size:11px;gap:10px}
   }
+  /* a grotesca geometrica nos titulos e o que da caracter a referencia */
+  .titulo,.duas h3,.marca,h1{font-family:var(--display);font-weight:680;
+    letter-spacing:-.035em}
+  .titulo{line-height:1.02}
+  body{font-family:var(--sans);letter-spacing:-.005em}
+  .menu button,.pilula,.bt,.ficha b{font-family:var(--sans)}
+  /* mais ar por dentro do cartao, como na referencia */
+  .capa{padding-block:14px 52px}
+  .duas{padding-block:60px}
+  .fichas-area{padding-block:42px 48px}
+  .palco{border-radius:20px}
+  .shell{box-shadow:0 34px 90px -34px rgba(20,38,56,.38),0 2px 10px rgba(20,38,56,.05)}
 </style>
 </head>
 <body>
@@ -435,20 +452,6 @@
 
     <div class="palco">
       <img class="heroi" src="brand/heroi.png" alt="Cruzain, the protein on the bench, with a docked compound in orange" width="1600" height="1000">
-      <div class="chamadas">
-        <div class="chamada" style="left:5%;top:56%">
-          <b id="cc1">—</b><span>molecules docked and published</span>
-        </div>
-        <div class="chamada" style="right:8%;top:11%;text-align:right">
-          <b id="cc2">0.70</b><span>AUC-ROC a target must clear</span>
-        </div>
-        <div class="chamada" style="left:30%;bottom:7%">
-          <b id="cc3">—</b><span>targets put through the gate</span>
-        </div>
-        <div class="chamada" style="right:8%;top:30%;text-align:right">
-          <b id="cc4">—</b><span>spent on rented compute</span>
-        </div>
-      </div>
 
       <div class="vidro">
         <p>A program picks a protein from a neglected disease, tests whether the
@@ -901,35 +904,6 @@ document.querySelectorAll(".menu button").forEach(b => {
   });
 });
 
-/* ---- chamadas da capa: numero medido, travessao quando nao se sabe ----
-   A referencia usava numero de vaidade ("110% Solution-Oriented"). Aqui cada
-   chamada sai de arquivo de dados, e some se o dado nao existir. */
-let ultimoDados = null, ultimoLote = null;
-function pintaChamadas(dados, lote) {
-  const t = (dados && dados.triagem) || {};
-  const v = (dados && dados.validacao) || {};
-  const comp = (dados && dados.compute) || {};
-  const mt = (lote && lote.motor) || {};
-  const fila = (lote && lote.fila_alvos) || [];
-
-  const docadas = (t.moleculas_triadas || 0) +
-                  ((lote && lote.resumo && lote.resumo.moleculas_triadas) || 0);
-  const comAuc = fila.filter(function (a) { return a.auc != null; }).length +
-                 ((v.enriquecimento && v.enriquecimento.auc != null) ? 1 : 0);
-  const gasto = (comp.gasto_total_usd || 0) + (mt.gpu_gasto_usd || 0);
-
-  const por = function (id, valor) {
-    const e = document.getElementById(id);
-    if (!e) return;
-    e.textContent = valor;
-    const pai = e.closest(".chamada");
-    if (pai) pai.hidden = (valor === "—");
-  };
-  por("cc1", docadas ? fmt(docadas) : "—");
-  por("cc3", comAuc ? String(comAuc) : "—");
-  por("cc4", gasto ? "$" + gasto.toFixed(2) : "—");
-}
-
 /* ---- botoes da capa: levam para aba ou rolam para a secao ---- */
 document.querySelectorAll("[data-ir]").forEach(b => {
   b.addEventListener("click", (ev) => {
@@ -964,7 +938,6 @@ mostraAba(location.hash.slice(1) || "cover", false);
 /* ---------------- dados ---------------- */
 fetch("data/dados.json").then(r => r.json()).then(d => {
   ultimoDados = d;
-  pintaChamadas(ultimoDados, ultimoLote);
   const alvo = d.alvo || {}, t = d.triagem || {}, v = d.validacao || {};
   const enr = v.enriquecimento || {};
 
@@ -1179,7 +1152,6 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
       .then(r => r.json())
       .then(lt => {
         ultimoLote = lt;
-        pintaChamadas(ultimoDados, ultimoLote);
         pintaLotes(lt);
         const p = document.getElementById("pulso");
         const vivo = lt.modo === "live";
