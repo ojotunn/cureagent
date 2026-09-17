@@ -384,6 +384,16 @@
   .secVisor #viewer{height:clamp(340px,58vh,640px);border-radius:14px}
   .secVisor .viewport{margin-bottom:10px}
   @media(max-width:700px){.secVisor #viewer{height:clamp(300px,52vh,460px)}}
+  @media(max-width:700px){
+    .secVisor .np{position:static;padding:0;margin-bottom:10px;
+      flex-direction:row;align-items:center;gap:10px}
+    .secVisor .np-box{min-width:0;flex:1;background:var(--shell);
+      backdrop-filter:none}
+    .secVisor .np-score{font-size:18px}
+    .secVisor .np-right{display:block;text-align:right;flex:none}
+    .secVisor .np-bar{width:64px}
+    .legend{font-size:11px;gap:10px}
+  }
 </style>
 </head>
 <body>
@@ -1472,12 +1482,20 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     view.render();
     view.spin("y", 0.18);
 
-    setTimeout(() => {
+    // Uma checagem unica a 1,5s acusava WebGL ausente no celular, onde o
+    // canvas ainda mede zero nesse instante. O aviso aparecia por cima de um
+    // desenho que estava funcionando, ou seja, a pagina mentia. Agora tenta
+    // varias vezes e so avisa se continuar zerado.
+    (function confereDesenho(tentativa) {
       const cv = el.querySelector("canvas");
-      if (!cv || cv.width < 10) el.insertAdjacentHTML("beforeend",
-        `<div class="fallback">WebGL unavailable in this browser — the measured
-         numbers below are unaffected.</div>`);
-    }, 1500);
+      if (cv && cv.width >= 10) return;              // desenhou: nada a dizer
+      if (tentativa < 8) return setTimeout(function () {
+        confereDesenho(tentativa + 1);
+      }, 1200);
+      el.insertAdjacentHTML("beforeend",
+        "<div class=\"fallback\">3D view unavailable in this browser. Every" +
+        " measured number on this page is unaffected.</div>");
+    })(0);
 
     tocaPoses(view, temLig ? 2 : 1);
   }).catch(e => { el.innerHTML = `<div class="fallback">structure failed to load — ${e}</div>`; });
