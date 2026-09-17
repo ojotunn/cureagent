@@ -713,7 +713,6 @@
     </div>
     <div class="legend">
     <span><i style="background:#7d8a96"></i>protein backbone</span>
-    <span><i style="background:#0e7c6b"></i>residues lining the site</span>
     <span><i style="background:#c2410c"></i>molecule being tested</span>
     <span id="dica"></span>
     </div>
@@ -1546,10 +1545,10 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
         }
       }
       const resi = [...perto].map(Number).filter(n => !isNaN(n));
-      if (resi.length) {
-        view.addStyle({model: 0, resi: resi},
-                      {stick: {radius: 0.11, color: "#0e7c6b", opacity: 0.85}});
-      }
+      // Os residuos do bolso saiam como rabisco azul-esverdeado fino por cima
+      // do corpo cinza: na camera da proteina inteira eles nao mostravam o
+      // bolso, so pareciam defeito de renderizacao. O bolso ja fica implicito
+      // por onde o composto laranja esta encaixado.
     }
     // enquadra o SITIO, nao a proteina inteira: e ali que o trabalho acontece
     view.zoomTo(temLig ? {model: 1} : {model: 0});
@@ -1609,7 +1608,7 @@ function tocaPoses(view, indiceModelo) {
       if (modelo !== null) view.removeModel(modelo);
       modelo = view.addModel(txt, "xyz");
       view.setStyle({model: modelo},
-                    {stick: {radius: 0.28, colorscheme: "orangeCarbon"}});
+                    {stick: {radius: 0.32, colorscheme: "orangeCarbon"}});
       view.render();
 
       document.getElementById("npId").textContent = p.id;
