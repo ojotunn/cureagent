@@ -8,8 +8,7 @@
   Regra dura: na timeline ele aparece a 32px e em circulo. Entao UMA forma so,
   contraste alto, zero detalhe fino. Tudo que for delicado desaparece.
 
-  Variantes:  ?v=proteina   a estrutura real do projeto, em cinza
-              ?v=numero     o 606, que e a identidade numerada
+  Variante:   a estrutura real do projeto, em cinza
   Nome:       ?n=CURE
 -->
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,19 +33,11 @@
     letter-spacing:.3em;color:var(--ink);text-transform:uppercase;
     text-shadow:0 2px 18px rgba(242,245,248,.95)}
 
-  /* ---- variante numero: 606 em bege sobre quase preto ---- */
-  body.numero .quadro{background:var(--ink);color:#fff;flex-direction:column}
-  body.numero .num{font-family:var(--display);font-size:400px;font-weight:800;
-    letter-spacing:-.05em;line-height:.8;color:var(--tan)}
-  body.numero .sub{font-family:var(--mono);font-size:40px;letter-spacing:.3em;
-    text-transform:uppercase;margin-top:34px;opacity:.82}
 </style>
 </head>
 <body>
   <div class="quadro">
     <div id="v"></div>
-    <div class="num"></div>
-    <div class="sub"></div>
     <div class="selo"></div>
   </div>
 
@@ -58,12 +49,6 @@
   const nome = (q.get("n") || "CURE").toUpperCase();
   document.body.className = v;
 
-  if (v === "numero") {
-    document.querySelector(".num").textContent = "606";
-    document.querySelector(".sub").textContent = nome;
-    document.title = "pronto";
-    return;
-  }
 
   document.querySelector(".selo").textContent = nome;
   const el = document.getElementById("v");
