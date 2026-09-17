@@ -358,6 +358,12 @@
   #tab-how>section:first-child,#tab-road>section:first-child{margin-top:30px}
   #tab-lab>section:last-child,#tab-results>section:last-child,
   #tab-how>section:last-child,#tab-road>section:last-child{margin-bottom:60px}
+  /* no palco da capa o visor E o render: sem borda propria, sem fundo */
+  .palco #viewer{height:clamp(300px,40vw,450px);border:0;border-radius:0;
+    background:transparent}
+  .palco .legend{display:none}
+  .palco .np{left:18px;top:18px;right:auto;max-width:230px}
+  .palco .np-right{display:none}
 </style>
 </head>
 <body>
