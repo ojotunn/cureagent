@@ -334,9 +334,10 @@
 
   /* ---------- fileira de fichas ---------- */
   .fichas-area{background:var(--shell-2);padding-block:34px 40px;margin-top:8px}
-  .fichas-tit{text-align:center;font-size:14.5px;color:var(--ink2);margin:0 0 18px}
-  .fichas{display:flex;gap:11px;overflow-x:auto;padding-bottom:6px;
-    scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+  .fichas-tit{text-align:left;font-size:14.5px;color:var(--ink2);margin:0 0 18px}
+  .fichas{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));
+    gap:11px;padding-bottom:0;
+    scrollbar-width:none}
   .fichas::-webkit-scrollbar{display:none}
   .ficha{flex:none;min-width:152px;background:var(--shell);border:1px solid var(--line);
     border-radius:11px;padding:13px 15px;display:flex;gap:10px;align-items:flex-start}
@@ -414,9 +415,20 @@
   /* o painel do heroi e LARGO e baixo, como na referencia. A imagem recorta
      em vez de esticar, senao o render de 1600x1000 domina a tela inteira. */
   .palco{aspect-ratio:21/9;display:block}
-  .heroi{width:100%;height:100%;object-fit:cover;object-position:50% 42%}
+  .heroi{width:100%;height:100%;object-fit:cover;object-position:50% 34%}
   @media(max-width:860px){.palco{aspect-ratio:4/3}}
   @media(max-width:520px){.palco{aspect-ratio:1/1}}
+  /* ---------- identidade: o registro numerado ---------- */
+  .marcador{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dim);display:flex;align-items:center;
+    gap:12px;margin:0 0 20px}
+  .marcador b{font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+  .marcador i{flex:1;height:1px;background:var(--line);display:block}
+  .sobretitulo{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dim);margin:0 0 18px}
+  .sobretitulo b{color:var(--tan);font-weight:500}
+  /* as secoes internas herdam o mesmo tom de rotulo */
+  h2{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;font-weight:500}
 </style>
 </head>
 <body>
@@ -453,6 +465,7 @@
 <div id="tab-cover" role="tabpanel">
 
   <div class="pad capa">
+    <p class="sobretitulo">Record <b>606</b> &nbsp;·&nbsp; Ehrlich numbered 605 failures before one worked</p>
     <h1 class="titulo" id="tituloCapa">Screening molecules against diseases nobody funds</h1>
 
     <div class="palco">
@@ -474,7 +487,7 @@
   </div>
 
   <div class="pad fichas-area">
-    <p class="fichas-tit">What the method commits to</p>
+    <p class="marcador"><b>01</b><i></i>What the method commits to</p>
     <div class="fichas">
       <div class="ficha"><em></em><div><b>Positive control</b><span>the pipeline reproduces known crystal poses</span></div></div>
       <div class="ficha"><em></em><div><b>Enrichment gate</b><span>AUC-ROC 0.70, fixed before any run</span></div></div>
@@ -485,7 +498,10 @@
     </div>
   </div>
 
-  <div class="pad duas" id="metodo">
+  <div class="pad" style="padding-top:44px">
+    <p class="marcador"><b>02</b><i></i>Why this exists</p>
+  </div>
+  <div class="pad duas" id="metodo" style="padding-top:0">
     <div>
       <h3>Most diseases of poverty have no one looking for a cure</h3>
       <a class="bt bt-br" href="#" data-ir="road">See the roadmap
@@ -766,6 +782,23 @@
 
 <!-- ====================== ABA 2 — RESULTADOS PUBLICADOS ====================== -->
 <div id="tab-results" role="tabpanel" hidden>
+
+  <section id="resultsVazio">
+    <p class="marcador"><b>00</b><i></i>Published results</p>
+    <div class="card">
+      <h3>Nothing published under this launch yet</h3>
+      <p class="note">No target has cleared the gate for this project, so there
+         is nothing to publish here and this page will not pretend otherwise.
+         The moment a screening run produces a score, every score lands here
+         with the file that produced it, including the runs that fail.</p>
+      <p class="note" style="margin-bottom:0">The work done before this launch
+         is archived rather than deleted: one target rejected on published
+         numbers, and a further seven put through the gate with the reasons
+         recorded. It is kept because knowing which target a method fails on is
+         a result. It is not presented as this project&rsquo;s record.</p>
+    </div>
+  </section>
+
 
   <section>
     <h2>The record</h2>
