@@ -281,7 +281,9 @@
   .marca{display:flex;align-items:center;gap:10px;font-weight:680;font-size:21px;
     letter-spacing:-.03em;color:var(--ink);margin-right:auto}
   .marca svg{flex:none}
-  .menu{display:flex;gap:26px;flex-wrap:wrap}
+  .menu{display:flex;gap:26px;flex-wrap:nowrap;overflow-x:auto;
+    scrollbar-width:none;-ms-overflow-style:none}
+  .menu::-webkit-scrollbar{display:none}
   .menu button{appearance:none;background:none;border:0;padding:6px 0;cursor:pointer;
     font:inherit;font-size:10.5px;font-weight:600;letter-spacing:.13em;
     text-transform:uppercase;color:var(--dim);position:relative}
@@ -364,6 +366,20 @@
   .palco .legend{display:none}
   .palco .np{left:18px;top:18px;right:auto;max-width:230px}
   .palco .np-right{display:none}
+  /* a imagem da capa: o render da nossa propria estrutura */
+  .heroi{display:block;width:100%;height:auto;max-width:100%}
+  /* no telefone a barra vira duas linhas de proposito: marca em cima,
+     abas embaixo numa faixa que rola. Antes o ROADMAP caia sozinho e
+     parecia titulo de secao. */
+  @media(max-width:700px){
+    .bar{flex-direction:column;align-items:stretch;gap:14px;padding-block:18px}
+    .marca{margin-right:0}
+    .menu{gap:20px;border-top:1px solid var(--line2);padding-top:12px}
+    .pilula{align-self:flex-start}
+    .titulo{font-size:clamp(27px,8vw,36px)}
+    .vidro{position:static;margin:0;border-radius:0;border-left:0;border-right:0;
+      border-bottom:0;max-width:none;background:rgba(255,255,255,.96)}
+  }
 </style>
 </head>
 <body>
@@ -404,27 +420,7 @@
       <span class="dot"></span><span id="estado">loading…</span></div>
 
     <div class="palco">
-      <div class="viewport">
-      <div id="viewer"><div class="fallback">loading structure…</div></div>
-      <div class="np" hidden id="np">
-      <div class="np-box">
-      <div class="np-tag" id="npTag">replay · run of 2026-09-14</div>
-      <div class="np-id" id="npId">—</div>
-      <div class="np-score" id="npScore">—</div>
-      <div class="np-class" id="npClass">—</div>
-      </div>
-      <div class="np-right">
-      <div class="np-count" id="npCount">—</div>
-      <div class="np-bar"><i id="npBar"></i></div>
-      </div>
-      </div>
-      </div>
-      <div class="legend">
-      <span><i style="background:#7d8a96"></i>protein backbone</span>
-      <span><i style="background:#0e7c6b"></i>residues lining the site</span>
-      <span><i style="background:#c2410c"></i>molecule being tested</span>
-      <span id="dica"></span>
-      </div>
+      <img class="heroi" src="brand/heroi.png" alt="Cruzain, the protein on the bench, with a docked compound in orange" width="1600" height="1000">
       <div class="chamadas">
         <div class="chamada" style="left:5%;top:56%">
           <b id="cc1">—</b><span>molecules docked and published</span>
@@ -630,7 +626,30 @@
 
   <section>
     <h2 id="tituloAlvo">The target on the bench</h2>
-    <div class="split3">
+    <div class="split">
+      <div>
+        <div class="viewport">
+        <div id="viewer"><div class="fallback">loading structure…</div></div>
+        <div class="np" hidden id="np">
+        <div class="np-box">
+        <div class="np-tag" id="npTag">replay · run of 2026-09-14</div>
+        <div class="np-id" id="npId">—</div>
+        <div class="np-score" id="npScore">—</div>
+        <div class="np-class" id="npClass">—</div>
+        </div>
+        <div class="np-right">
+        <div class="np-count" id="npCount">—</div>
+        <div class="np-bar"><i id="npBar"></i></div>
+        </div>
+        </div>
+        </div>
+        <div class="legend">
+        <span><i style="background:#7d8a96"></i>protein backbone</span>
+        <span><i style="background:#0e7c6b"></i>residues lining the site</span>
+        <span><i style="background:#c2410c"></i>molecule being tested</span>
+        <span id="dica"></span>
+        </div>
+      </div>
       <div>
       </div>
       <div>
@@ -852,7 +871,7 @@ function mostraAba(nome, rolar) {
     x.setAttribute('aria-selected', String(x.dataset.tab === nome)));
   ABAS.forEach(t => document.getElementById('tab-' + t).hidden = (t !== nome));
   if (rolar) window.scrollTo({top: 0, behavior: 'instant'});
-  if (nome === "cover" && viewer3d) {
+  if (nome === "lab" && viewer3d) {
     // o canvas nasce com tamanho zero se a aba estava escondida
     viewer3d.resize(); viewer3d.render();
   }
@@ -1322,7 +1341,8 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
   }
 
   /* ---- a fila de alvos medidos ---- */
-  fetch("data/catalogo.json").then(r => r.json()).then(cat => {
+  fetch("data/catalogo.json").then(r => r.ok ? r.json() : null).then(cat => {
+    if (!cat) return;          // catalogo ainda nao montado: some, nao quebra
     const alvos = (cat.alvos || []).filter(a => a.doenca !== "[human counterpart]");
     if (!alvos.length) return;
     document.getElementById("secFila").hidden = false;
