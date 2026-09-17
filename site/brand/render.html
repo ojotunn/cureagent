@@ -1,0 +1,41 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>render do heroi</title>
+<!--
+  Gera a imagem da capa a partir da NOSSA estrutura, nao de banco de imagem.
+  Abrir num Chrome headless e capturar; o resultado vira site/brand/heroi.png.
+  Existe para a capa nao depender de WebGL no celular, que foi o que fez a
+  molecula desaparecer para quem entrava pelo telefone.
+-->
+<style>
+  html,body{margin:0;background:#e7eef6}
+  #v{width:1600px;height:1000px;position:relative}
+</style>
+<div id="v"></div>
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script>
+(async () => {
+  const el = document.getElementById("v");
+  const view = $3Dmol.createViewer(el, {backgroundColor: "#e7eef6"});
+  const [rec, lig] = await Promise.all([
+    fetch("../data/receptor.pdb").then(r => r.text()),
+    fetch("../data/site_ref.pdb").then(r => r.text()).catch(() => null),
+  ]);
+  view.addModel(rec, "pdb");
+  // a proteina inteira como um corpo claro e volumoso, que e o que se le bem
+  // numa capa; os detalhes finos ficam para o visor do laboratorio
+  view.setStyle({model: 0}, {cartoon: {color: "#9fb0c0", opacity: 1, thickness: 1.1}});
+  if (lig && lig.trim()) {
+    view.addModel(lig, "pdb");
+    view.setStyle({model: 1}, {stick: {radius: 0.34, colorscheme: "orangeCarbon"}});
+    view.addStyle({model: 1}, {sphere: {radius: 0.55, colorscheme: "orangeCarbon"}});
+  }
+  view.zoomTo({model: 0});
+  view.zoom(1.25);
+  view.rotate(18, "x");
+  view.rotate(-24, "y");
+  view.render();
+  window.prontoPara = true;
+  document.title = "pronto";
+})();
+</script>
