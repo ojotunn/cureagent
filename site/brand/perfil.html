@@ -28,7 +28,7 @@
 
   /* ---- variante proteina: a estrutura real, recortada apertada ---- */
   body.proteina .quadro{background:var(--papel)}
-  body.proteina #v{position:absolute;inset:-14%;}
+  body.proteina #v{position:absolute;inset:0}
   body.proteina .selo{position:absolute;left:0;right:0;bottom:64px;
     text-align:center;font-family:var(--mono);font-size:44px;
     letter-spacing:.3em;color:var(--ink);text-transform:uppercase;
@@ -72,13 +72,13 @@
   const lig = await fetch("../data/site_ref.pdb").then((r) => r.text()).catch(() => null);
   view.addModel(rec, "pdb");
   // fita grossa e opaca: a 32px so sobrevive massa, nao desenho fino
-  view.setStyle({model: 0}, {cartoon: {color: "#8d9aa8", opacity: 1, thickness: 1.5}});
+  view.setStyle({model: 0}, {cartoon: {color: "#7f8d9c", opacity: 1, thickness: 1.6}});
   if (lig && lig.trim()) {
     view.addModel(lig, "pdb");
-    view.setStyle({model: 1}, {sphere: {radius: 1.1, color: "#c9a97f"}});
+    view.setStyle({model: 1}, {sphere: {radius: 1.5, color: "#c9a97f"}});
   }
   view.zoomTo({model: 0});
-  view.zoom(1.5);
+  view.zoom(0.92);
   view.rotate(14, "x");
   view.rotate(-28, "y");
   view.render();
