@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>avatar</title>
+<!--
+  Avatar do X, 1000x1000, renderizado em Chrome headless.
+  Regra dura: na timeline ele aparece a 32px e em circulo. Entao UMA forma so,
+  contraste alto, zero detalhe fino. Tudo que for delicado desaparece.
+
+  Variantes:  ?v=proteina   a estrutura real do projeto, em cinza
+              ?v=numero     o 606, que e a identidade numerada
+  Nome:       ?n=CURE
+-->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  :root{
+    --ink:#10131a; --tan:#c9a97f; --cinza:#8d9aa8;
+    --papel:#f2f5f8;
+    --display:"Inter Tight",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1000px;height:1000px;overflow:hidden}
+  .quadro{width:1000px;height:1000px;position:relative;overflow:hidden;
+    display:flex;align-items:center;justify-content:center}
+
+  /* ---- variante proteina: a estrutura real, recortada apertada ---- */
+  body.proteina .quadro{background:var(--papel)}
+  body.proteina #v{position:absolute;inset:-14%;}
+  body.proteina .selo{position:absolute;left:0;right:0;bottom:64px;
+    text-align:center;font-family:var(--mono);font-size:44px;
+    letter-spacing:.3em;color:var(--ink);text-transform:uppercase;
+    text-shadow:0 2px 18px rgba(242,245,248,.95)}
+
+  /* ---- variante numero: 606 em bege sobre quase preto ---- */
+  body.numero .quadro{background:var(--ink);color:#fff;flex-direction:column}
+  body.numero .num{font-family:var(--display);font-size:400px;font-weight:800;
+    letter-spacing:-.05em;line-height:.8;color:var(--tan)}
+  body.numero .sub{font-family:var(--mono);font-size:40px;letter-spacing:.3em;
+    text-transform:uppercase;margin-top:34px;opacity:.82}
+</style>
+</head>
+<body>
+  <div class="quadro">
+    <div id="v"></div>
+    <div class="num"></div>
+    <div class="sub"></div>
+    <div class="selo"></div>
+  </div>
+
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script>
+(async () => {
+  const q = new URLSearchParams(location.search);
+  const v = q.get("v") || "proteina";
+  const nome = (q.get("n") || "CURE").toUpperCase();
+  document.body.className = v;
+
+  if (v === "numero") {
+    document.querySelector(".num").textContent = "606";
+    document.querySelector(".sub").textContent = nome;
+    document.title = "pronto";
+    return;
+  }
+
+  document.querySelector(".selo").textContent = nome;
+  const el = document.getElementById("v");
+  const view = $3Dmol.createViewer(el, {backgroundColor: "#f2f5f8"});
+  const rec = await fetch("../data/receptor.pdb").then((r) => r.text());
+  const lig = await fetch("../data/site_ref.pdb").then((r) => r.text()).catch(() => null);
+  view.addModel(rec, "pdb");
+  // fita grossa e opaca: a 32px so sobrevive massa, nao desenho fino
+  view.setStyle({model: 0}, {cartoon: {color: "#8d9aa8", opacity: 1, thickness: 1.5}});
+  if (lig && lig.trim()) {
+    view.addModel(lig, "pdb");
+    view.setStyle({model: 1}, {sphere: {radius: 1.1, color: "#c9a97f"}});
+  }
+  view.zoomTo({model: 0});
+  view.zoom(1.5);
+  view.rotate(14, "x");
+  view.rotate(-28, "y");
+  view.render();
+  document.title = "pronto";
+})();
+</script>
+</body>
+</html>

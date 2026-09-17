@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>banner</title>
+<!--
+  Banner do X, 1500x500 exatos, renderizado em Chrome headless.
+  A proteina e a estrutura REAL do projeto, nao arte generica.
+
+  O canto inferior esquerdo fica vazio de proposito: o X sobrepoe o avatar ali,
+  e tudo que estiver embaixo dele desaparece.
+
+  Nome:  ?n=CURE     Frase: ?f=texto
+-->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  :root{
+    --ink:#10131a; --ink2:#3b434f; --dim:#6b7683;
+    --tan:#c9a97f; --papel:#ffffff; --painel:#eaeff5; --linha:#e7ebf1;
+    --display:"Inter Tight",system-ui,sans-serif;
+    --sans:"Inter",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{width:1500px;height:500px;overflow:hidden;background:var(--papel);
+    font-family:var(--sans);color:var(--ink);position:relative}
+
+  .grade{display:grid;grid-template-columns:1fr 640px;height:100%}
+
+  /* o avatar do X cobre o canto inferior esquerdo: nada de texto abaixo de 330px */
+  .esq{padding:56px 0 150px 84px;display:flex;flex-direction:column;
+    justify-content:center}
+  .registro{font-family:var(--mono);font-size:15px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--dim);margin-bottom:22px}
+  .registro b{color:var(--tan);font-weight:500}
+  h1{font-family:var(--display);font-size:92px;font-weight:700;
+    letter-spacing:-.045em;line-height:.94}
+  .frase{font-size:24px;color:var(--ink2);margin-top:20px;max-width:30ch;
+    line-height:1.32}
+
+  .dir{position:relative;background:var(--painel);overflow:hidden;
+    border-left:1px solid var(--linha)}
+  #v{position:absolute;inset:-8%}
+</style>
+</head>
+<body>
+  <div class="grade">
+    <div class="esq">
+      <div class="registro">Record <b>606</b> &nbsp;·&nbsp; 605 failures came first</div>
+      <h1 id="nome">CURE</h1>
+      <p class="frase" id="frase">Screening molecules against diseases nobody funds. Every run published, failures included.</p>
+    </div>
+    <div class="dir"><div id="v"></div></div>
+  </div>
+
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script>
+(async () => {
+  const q = new URLSearchParams(location.search);
+  document.getElementById("nome").textContent = (q.get("n") || "CURE").toUpperCase();
+  if (q.get("f")) document.getElementById("frase").textContent = q.get("f");
+
+  const view = $3Dmol.createViewer(document.getElementById("v"),
+    {backgroundColor: "#eaeff5"});
+  const rec = await fetch("../data/receptor.pdb").then((r) => r.text());
+  const lig = await fetch("../data/site_ref.pdb").then((r) => r.text()).catch(() => null);
+  view.addModel(rec, "pdb");
+  view.setStyle({model: 0}, {cartoon: {color: "#8d9aa8", opacity: 1, thickness: 1.2}});
+  if (lig && lig.trim()) {
+    view.addModel(lig, "pdb");
+    view.setStyle({model: 1}, {stick: {radius: 0.42, colorscheme: "orangeCarbon"}});
+    view.addStyle({model: 1}, {sphere: {radius: 0.7, colorscheme: "orangeCarbon"}});
+  }
+  view.zoomTo({model: 0});
+  view.zoom(1.18);
+  view.rotate(16, "x");
+  view.rotate(-26, "y");
+  view.render();
+  document.title = "pronto";
+})();
+</script>
+</body>
+</html>
