@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- A marca do Cure. Massa, nao contorno: a 16px contorno fino desaparece. -->
+  <rect width="32" height="32" rx="7" fill="#10131a"/>
+  <circle cx="16" cy="16" r="7.4" fill="#c9a97f"/>
+</svg>

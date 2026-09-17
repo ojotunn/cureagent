@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>icone</title>
+<!--
+  A marca, para favicon. Renderizada em Chrome headless nos tamanhos que o
+  navegador pede.  ?px=32
+
+  Regra dura: a 16px nada de contorno fino ou detalhe. O icone anterior era um
+  contorno de circulo com ponto no meio, e no favicon o contorno desaparecia.
+  Aqui e massa: fundo quase preto, disco bege centrado. Mesma familia visual do
+  cabecalho, mas legivel a 16.
+-->
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{background:transparent}
+  .m{position:relative;display:block;background:#10131a}
+  .m i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+    background:#c9a97f;border-radius:50%;display:block}
+</style>
+</head>
+<body>
+  <div class="m" id="m"><i id="d"></i></div>
+<script>
+  const px = Math.max(16, Math.min(512, Number(new URLSearchParams(location.search).get("px")) || 32));
+  const m = document.getElementById("m");
+  m.style.width = px + "px";
+  m.style.height = px + "px";
+  // cantos proporcionais: arredonda sem virar circulo
+  m.style.borderRadius = Math.round(px * 0.22) + "px";
+  const d = document.getElementById("d");
+  const disco = Math.round(px * 0.46);
+  d.style.width = disco + "px";
+  d.style.height = disco + "px";
+  document.body.style.width = px + "px";
+  document.body.style.height = px + "px";
+  document.title = "pronto";
+</script>
+</body>
+</html>
