@@ -6,7 +6,7 @@
 # nao ouvir nada por 6 minutos, ele mesmo passa a dizer que o motor parou —
 # e melhor a pagina admitir silencio do que repetir um numero velho.
 export PATH=/opt/conda/bin:/usr/local/bin:$PATH
-ALVO="${EHRLICH_URL:-https://ehrlich.bio}/api/motor"
+ALVO="${EHRLICH_URL:-https://cure.codes}/api/motor"
 
 if [ -z "$EHRLICH_TOKEN" ]; then
   echo "sem EHRLICH_TOKEN no ambiente — nao ha o que empurrar" >&2

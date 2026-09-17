@@ -52,6 +52,18 @@ function leJSON(p, padrao) {
   try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return padrao; }
 }
 
+// O mint vem do volume se estiver la, senao do token.json. O volume vence
+// porque ele pode ser escrito por POST /api/mint em segundos, e publicar um
+// arquivo novo leva minutos que custam compradores no lancamento.
+function mintAtivo() {
+  try {
+    const v = JSON.parse(fs.readFileSync(path.join(DADOS, "mint.json"), "utf8"));
+    if (v && v.mint) return String(v.mint);
+  } catch {}
+  const tk = leJSON(path.join(RAIZ, "token.json"), {});
+  return tk.mint || null;
+}
+
 const deposito = new Deposito(DADOS);
 const aberto = deposito.abre();
 console.log("deposito: " + aberto.compras + " compras conhecidas" +
@@ -68,13 +80,13 @@ const vivo = {
 
 /* ------------------------------------------------------------- coleta */
 async function coleta() {
-  const tk = leJSON(path.join(RAIZ, "token.json"), {});
-  if (!tk.mint) {                     // antes do lancamento nao ha o que coletar
+  const mint = mintAtivo();
+  if (!mint) {                        // antes do lancamento nao ha o que coletar
     vivo.coletaErro = null;
     return;
   }
-  deposito.fixaMint(tk.mint);
-  const trades = await tradesRecentes(tk.mint);
+  deposito.fixaMint(mint);
+  const trades = await tradesRecentes(mint);
   const novas = deposito.registra(trades);
   vivo.novasNoUltimo = novas.length;
   vivo.coletaEm = Date.now();
@@ -156,7 +168,7 @@ function montaLotes() {
   return {
     _comentario: disco._comentario,
     rede: "Solana · pump.fun",
-    mint: tk.mint || null,
+    mint: mintAtivo(),
     modo: m ? "live" : "parado",
     mostrar_endereco: disco.mostrar_endereco || "truncado",
     atualizado_em: new Date().toISOString().slice(0, 16).replace("T", " "),
@@ -214,6 +226,30 @@ const servidor = http.createServer(async (req, res) => {
     }
   }
 
+  // ---- o mint entra aqui no momento do lancamento, sem publicar nada
+  if (req.method === "POST" && caminho === "/api/mint") {
+    const auth = req.headers.authorization || "";
+    if (!SEGREDO || auth !== "Bearer " + SEGREDO) {
+      res.writeHead(401); return res.end("unauthorized");
+    }
+    try {
+      const d = JSON.parse(await corpo(req, 4096));
+      const mint = String((d && d.mint) || "").trim();
+      // endereco da Solana: base58, 32 a 44 caracteres
+      if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(mint)) {
+        throw new Error("mint invalido");
+      }
+      fs.mkdirSync(DADOS, { recursive: true });
+      fs.writeFileSync(path.join(DADOS, "mint.json"),
+        JSON.stringify({ mint, posto_em: new Date().toISOString() }, null, 1));
+      coleta().catch(function () {});          // comeca a coletar agora
+      res.writeHead(200, { "Content-Type": "application/json" });
+      return res.end(JSON.stringify({ ok: true, mint }));
+    } catch (e) {
+      res.writeHead(400); return res.end("bad request: " + e.message);
+    }
+  }
+
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.writeHead(405, { Allow: "GET, HEAD, POST" });
     return res.end("method not allowed");
@@ -233,7 +269,7 @@ const servidor = http.createServer(async (req, res) => {
     const tk = leJSON(path.join(RAIZ, "token.json"), {});
     const d = {
       rede: "solana/pump.fun",
-      mint: tk.mint || null,
+      mint: mintAtivo(),
       coleta_ha_s: vivo.coletaEm ? Math.round((Date.now() - vivo.coletaEm) / 1000) : null,
       coleta_erro: vivo.coletaErro,
       novas_no_ultimo_ciclo: vivo.novasNoUltimo,
@@ -285,8 +321,8 @@ async function ciclo() {
 }
 async function cicloLento() {
   const tk = leJSON(path.join(RAIZ, "token.json"), {});
-  if (tk.mint) {
-    const f = await ficha(tk.mint).catch(() => null);
+  if (mintAtivo()) {
+    const f = await ficha(mintAtivo()).catch(() => null);
     if (f) vivo.ficha = f;
   }
   const c = await custoDasPlacas().catch(() => null);
