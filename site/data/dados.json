@@ -68,72 +68,72 @@
  "roadmap": [
   {
    "fase": 0,
-   "nome": "Pipeline built and validated",
-   "custo": "$0",
-   "confianca": "measured",
-   "base": "ran on a local CPU, nothing rented",
-   "estado": "next"
+   "nome": "Prove the method can separate real inhibitors from lookalikes",
+   "custo": "$0.28",
+   "confianca": "estimated",
+   "estado": "next",
+   "base": "One enrichment run against a case with a published, achievable score. Until this passes, rejecting a target proves nothing about the target. It is the step this project has never run, and everything else waits on it."
   },
   {
    "fase": 1,
-   "nome": "Target validation — enrichment and pose",
-   "custo": "$0",
-   "confianca": "measured",
-   "base": "639 dockings, 61 minutes on 16 local cores",
-   "estado": "locked"
+   "nome": "Validate the first target",
+   "custo": "$0.28",
+   "confianca": "estimated",
+   "estado": "locked",
+   "base": "About 650 dockings per attempt: measured inhibitors against property-matched decoys, with the pass mark written down first. A target that fails is published with the number that failed it."
   },
   {
    "fase": 2,
-   "nome": "Fair decoys, and a second target evaluated",
-   "custo": "$1.95",
+   "nome": "Assemble a real screening library",
+   "custo": "$0",
    "confianca": "measured",
-   "base": "Measured: one validation round is about 642 dockings (measured inhibitors plus property-matched decoys). This is the cost of putting all seven queued targets through the gate, whether they pass or fail.",
-   "estado": "locked"
+   "estado": "locked",
+   "base": "Collection work, not compute. Purchasable compounds from the public catalogues, so that anything found can actually be bought and tested."
   },
   {
    "fase": 3,
-   "nome": "1 million molecules screened",
+   "nome": "One million molecules screened",
    "custo": "$435",
-   "confianca": "measured",
-   "base": "Measured on the rented pod: 414 molecules per hour on 56 cores at $0.18/hour, which is $0.000435 per molecule. AutoDock Vina is CPU only; moving the docking to the GPU we already rent should cut this sharply, but that is not measured yet and is not assumed here.",
-   "estado": "locked"
+   "confianca": "estimated",
+   "estado": "locked",
+   "base": "Estimated from a measured rate: 414 molecules an hour on 56 rented cores at $0.18 an hour, which is $0.000435 a molecule. That rate was measured on a card that has since been released, and it is CPU docking; moving to the GPU should cut it, and that is not assumed here."
   },
   {
    "fase": 4,
-   "nome": "Beat the largest published screen on this target",
-   "custo": "$1,739",
-   "confianca": "measured",
-   "base": "Same measured rate, four million molecules — the size of the largest published screen against this target.",
-   "estado": "locked"
+   "nome": "Four million molecules, the size of the largest published screen",
+   "custo": "$1,740",
+   "confianca": "estimated",
+   "estado": "locked",
+   "base": "Same measured rate, four times the molecules."
   },
   {
    "fase": 5,
-   "nome": "Buy the 20 best compounds",
+   "nome": "Buy the twenty best compounds",
    "custo": "$1,000 – 3,000",
    "confianca": "unquoted",
-   "base": "made-to-order synthesis, roughly three weeks. No supplier has quoted us yet — this is an order of magnitude, not a price.",
-   "estado": "locked"
+   "estado": "locked",
+   "base": "Made to order, roughly three weeks. No supplier has quoted us, so this is an order of magnitude and not a price."
   },
   {
    "fase": 6,
    "nome": "Enzyme assay in a real laboratory",
    "custo": "$2,000 – 8,000",
    "confianca": "unquoted",
-   "base": "does the molecule actually block the protein? Needs a laboratory to quote it; a conversation, not a web search.",
-   "estado": "locked"
+   "estado": "locked",
+   "base": "Does the compound actually block the protein? Needs a laboratory to quote it, which is a conversation rather than a web search."
   },
   {
    "fase": 7,
    "nome": "Cell assay — parasite killed, human cells spared",
    "custo": "$5,000 – 15,000",
    "confianca": "unquoted",
-   "base": "the last rung this project can reach on its own",
-   "estado": "locked"
+   "estado": "locked",
+   "base": "The last rung this project can reach on its own."
   }
  ],
  "roadmap_total": {
   "ate_bancada": "$3,000 – 11,000",
-  "nota": "Everything from an empty screen to a result on a real laboratory bench. The computing really is the cheap part: at the rate measured on the rented card, four million molecules cost $1,739. It is the glassware that costs."
+  "nota": "Everything from an empty screen to a result on a real laboratory bench. The computing is the cheap part: at the rate measured before this launch, four million molecules cost $1,740. It is the glassware that costs."
  },
  "compute": {
   "gasto_total_usd": 0,

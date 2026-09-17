@@ -118,6 +118,53 @@ def fila(validando=False):
     return saida
 
 
+FRASES = [
+    ("validando ",            "Putting %s through the enrichment gate"),
+    ("fim de ",               "Finished with %s"),
+    ("sem teste possivel",    "%s could not be tested, reason recorded"),
+    ("alvo aprovado",         "A target cleared the gate: screening takes over"),
+    ("fila de alvos esgotada", "Worked through the whole target queue"),
+    ("adotado: ",             "Adopted the result of %s"),
+]
+
+
+def diario(etapa=None, limite=14):
+    """As linhas que a pagina mostra ao lado do 3D.
+
+    Cada uma vem de ciclo.log, que o supervisor escreveu, mais a etapa atual do
+    validador. Nada e gerado para parecer vivo: um painel que inventa atividade
+    seria o contrario do que este projeto existe para ser.
+    """
+    saida = []
+    try:
+        with open(BASE + "/out/ciclo.log", "rb") as fh:
+            fh.seek(0, 2)
+            fh.seek(max(0, fh.tell() - 6000))
+            bruto = fh.read().decode("utf-8", "replace")
+    except Exception:
+        bruto = ""
+
+    for linha in bruto.splitlines():
+        l = linha.strip()
+        if not l:
+            continue
+        partes = l.split(" ", 1)
+        quando, resto = (partes[0], partes[1]) if len(partes) == 2 else ("", l)
+        hora = quando[11:16] if len(quando) >= 16 else quando[:5]
+        texto = None
+        for chave, molde in FRASES:
+            if chave in resto:
+                alvo = resto.split(chave)[-1].strip() if chave.endswith(" ") else ""
+                texto = (molde % alvo) if "%s" in molde else molde
+                break
+        if texto:
+            saida.append({"t": hora, "texto": texto})
+
+    if etapa:
+        saida.append({"t": time.strftime("%H:%M", time.gmtime()),
+                      "texto": etapa[0].upper() + etapa[1:]})
+    return saida[-limite:]
+
 def main():
     validando = rodando("[v]alida.py")
     triando = rodando("[/]work/roda.sh")
@@ -134,6 +181,7 @@ def main():
         "nucleos": nucleos,
         "biblioteca": conta(BASE + "/prod/ligs", ".pdbqt", "_out"),
         "fila_alvos": fila(validando),
+        "diario": diario(etapa),
         "atualizado": time.strftime("%Y-%m-%d %H:%M", time.gmtime()),
     }
 
