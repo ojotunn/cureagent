@@ -85,10 +85,10 @@
   {
    "fase": 2,
    "nome": "Assemble a real screening library",
-   "custo": "$0",
-   "confianca": "measured",
+   "custo": "—",
+   "confianca": "no compute",
    "estado": "locked",
-   "base": "Collection work, not compute. Purchasable compounds from the public catalogues, so that anything found can actually be bought and tested."
+   "base": "Collection work, not compute: purchasable compounds pulled from the public catalogues so that anything found can actually be bought and tested. It spends nothing on hardware, which is why it carries no price rather than a price of zero."
   },
   {
    "fase": 3,
