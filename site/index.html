@@ -380,6 +380,10 @@
     .vidro{position:static;margin:0;border-radius:0;border-left:0;border-right:0;
       border-bottom:0;max-width:none;background:rgba(255,255,255,.96)}
   }
+  /* no laboratorio o visor e o espetaculo: largura toda e bem mais alto */
+  .secVisor #viewer{height:clamp(340px,58vh,640px);border-radius:14px}
+  .secVisor .viewport{margin-bottom:10px}
+  @media(max-width:700px){.secVisor #viewer{height:clamp(300px,52vh,460px)}}
 </style>
 </head>
 <body>
@@ -481,7 +485,6 @@
     </div>
   </div>
 
-</div>
 
 
 <!-- ====================== ABA 1 — O AGENTE TRABALHANDO ====================== -->
@@ -617,7 +620,34 @@
 
   </div>
 
+</div>
 <div id="tab-lab" role="tabpanel" hidden>
+
+  <section class="secVisor">
+    <h2>The agent at work <span class="pulso parado" id="pulsoLab" style="margin-left:10px"><i></i><span></span></span></h2>
+    <div class="viewport">
+    <div id="viewer"><div class="fallback">loading structure…</div></div>
+    <div class="np" hidden id="np">
+    <div class="np-box">
+    <div class="np-tag" id="npTag">replay · run of 2026-09-14</div>
+    <div class="np-id" id="npId">—</div>
+    <div class="np-score" id="npScore">—</div>
+    <div class="np-class" id="npClass">—</div>
+    </div>
+    <div class="np-right">
+    <div class="np-count" id="npCount">—</div>
+    <div class="np-bar"><i id="npBar"></i></div>
+    </div>
+    </div>
+    </div>
+    <div class="legend">
+    <span><i style="background:#7d8a96"></i>protein backbone</span>
+    <span><i style="background:#0e7c6b"></i>residues lining the site</span>
+    <span><i style="background:#c2410c"></i>molecule being tested</span>
+    <span id="dica"></span>
+    </div>
+  </section>
+
 
   <section>
     <h2 id="tituloFeito">Work done so far</h2>
@@ -626,30 +656,7 @@
 
   <section>
     <h2 id="tituloAlvo">The target on the bench</h2>
-    <div class="split">
-      <div>
-        <div class="viewport">
-        <div id="viewer"><div class="fallback">loading structure…</div></div>
-        <div class="np" hidden id="np">
-        <div class="np-box">
-        <div class="np-tag" id="npTag">replay · run of 2026-09-14</div>
-        <div class="np-id" id="npId">—</div>
-        <div class="np-score" id="npScore">—</div>
-        <div class="np-class" id="npClass">—</div>
-        </div>
-        <div class="np-right">
-        <div class="np-count" id="npCount">—</div>
-        <div class="np-bar"><i id="npBar"></i></div>
-        </div>
-        </div>
-        </div>
-        <div class="legend">
-        <span><i style="background:#7d8a96"></i>protein backbone</span>
-        <span><i style="background:#0e7c6b"></i>residues lining the site</span>
-        <span><i style="background:#c2410c"></i>molecule being tested</span>
-        <span id="dica"></span>
-        </div>
-      </div>
+    <div class="split3">
       <div>
       </div>
       <div>
@@ -1192,6 +1199,12 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
         p.lastElementChild.textContent = !vivo ? "not running"
           : ocioso ? `idle ${esc(mt.etapa || "between targets")}`
           : `${validando ? "validating" : "screening"} on ${frota}`;
+        // o pulsoLab espelha o mesmo estado no topo do laboratorio
+        const pl = document.getElementById("pulsoLab");
+        if (pl) {
+          pl.className = p.className;
+          pl.lastElementChild.textContent = p.lastElementChild.textContent;
+        }
         const cx = document.getElementById("motorCaixa");
         const nt = document.getElementById("motorNota");
         if (cx) {
