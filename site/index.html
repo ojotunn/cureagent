@@ -826,41 +826,57 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
     const trunc = e => (lt.mostrar_endereco === "completo" || !e || e.length < 14)
       ? e : `${e.slice(0, 6)}…${e.slice(-4)}`;
 
+    const integ = lt.integridade || {};
     document.getElementById("loteResumo").innerHTML = [
       [fmt(res.financiadores || 0), "people who paid"],
-      [fmt(res.moleculas_financiadas || 0), "molecules screened for them"],
-      [fmt(res.cota_total || 0), "molecules owed"],
-      [fmt(res.na_fila || 0), "batches queued"],
+      [fmt(res.compras || 0), "purchases"],
+      ["$" + fmt(Math.round(res.pago_usd || 0)), "paid in total"],
+      [fmt(res.moleculas_triadas || 0), "molecules screened"],
     ].map(([b, s]) => `<div><b>${b}</b><span>${s}</span></div>`).join("");
+
+    // Se o coletor subiu depois da primeira compra, a lista pode estar
+    // incompleta. A pagina diz isso em vez de afirmar uma fila inteira que
+    // nunca viu inteira — foi essa omissao que sumiu com 38 compradores antes.
+    const nInt = document.getElementById("avisoFila");
+    if (nInt) {
+      const furada = integ.completa === false;
+      nInt.hidden = !furada;
+      if (furada) nInt.innerHTML =
+        " <b>This list may be incomplete.</b> The collector started watching at " +
+        esc(String(integ.coletor_desde || "").slice(0, 16).replace("T", " ")) +
+        " UTC, after the first purchase at " +
+        esc(String(integ.primeira_compra || "").slice(0, 16).replace("T", " ")) +
+        " UTC. pump.fun only serves the most recent purchases and does not page," +
+        " so anything before the collector woke up cannot be recovered.";
+    }
 
     if (!lotes.length) {
       document.getElementById("loteCorpo").innerHTML = `
         <div class="vazio">
           <b>No purchases yet</b>
-          Nothing is for sale at the moment. When it is, every batch appears here
-          within seconds of the transaction — address, molecules screened, best
-          score found, and the minutes of GPU it paid for.
+          Nothing has been bought yet. Every purchase appears here within
+          seconds of the transaction: the address, what it paid, and the share
+          of screening it accounts for.
         </div>`;
       return;
     }
 
     document.getElementById("loteCorpo").innerHTML =
       `<div class="tablewrap scroll"><table>
-        <thead><tr><th>when</th><th>address</th><th>paid</th><th>molecules</th>
-          <th>best score</th><th>GPU</th><th>state</th></tr></thead><tbody>` +
+        <thead><tr><th>when</th><th>address</th><th>paid</th><th>share</th>
+          <th>molecules credited</th><th>state</th></tr></thead><tbody>` +
       lotes.map(l => `<tr>
         <td>${esc(l.ts || "")}</td>
         <td class="addr">${l.tx
-          ? `<a href="https://robinhoodchain.blockscout.com/tx/${esc(l.tx)}" target="_blank" rel="noopener">${esc(trunc(l.endereco))}</a>`
+          ? `<a href="https://solscan.io/tx/${esc(l.tx)}" target="_blank" rel="noopener">${esc(trunc(l.endereco))}</a>`
           : esc(trunc(l.endereco))}</td>
-        <td>${l.eth != null ? l.eth.toFixed(5) + " ETH" : "—"}</td>
+        <td>${l.sol != null ? l.sol.toFixed(4) + " SOL" : "—"}${l.usd ? ` <span style="color:var(--dim)">$${l.usd.toFixed(2)}</span>` : ""}</td>
+        <td>${l.fatia != null ? l.fatia.toFixed(3) + "%" : "—"}</td>
         <td>${l.moleculas != null ? fmt(l.moleculas)
-              : `<span style="color:var(--dim)">${fmt(l.cota || 0)} owed</span>`}</td>
-        <td>${l.melhor != null ? l.melhor.toFixed(2) : "—"}</td>
-        <td>${l.gpu_min != null ? l.gpu_min + " min" : "—"}</td>
-        <td>${l.estado === "running" ? `<span class="warnc">running</span>`
-              : l.estado === "pronto" ? `<span class="pass">done</span>`
-              : `<span style="color:var(--dim)">queued</span>`}</td>
+              : `<span style="color:var(--dim)">none yet</span>`}</td>
+        <td>${l.estado === "running" ? `<span class="warnc">screening</span>`
+              : l.estado === "credited" ? `<span class="pass">credited</span>`
+              : `<span style="color:var(--dim)">waiting for the engine</span>`}</td>
       </tr>`).join("") + `</tbody></table></div>`;
 
     // marca como novo o que chegou depois da primeira carga
@@ -940,14 +956,12 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
               // isto a pagina poderia contar moleculas subindo enquanto o
               // estoque real e uma fracao do que foi vendido.
               if (mt.biblioteca != null) {
-                const devido = (lt.resumo && lt.resumo.cota_total) || 0;
+                const pago = (lt.resumo && lt.resumo.pago_usd) || 0;
                 partes.push(
-                  `Library ready to screen: ${fmt(mt.biblioteca)} prepared molecules` +
-                  (devido ? ` against ${fmt(devido)} owed to the queue` : "") +
-                  (mt.biblioteca < devido
-                    ? ". Collecting a larger library is open work, and it is "
-                      + "collection, not compute."
-                    : "."));
+                  "Library ready to screen: " + fmt(mt.biblioteca) + " prepared molecules" +
+                  (pago ? ". Purchases so far total $" + fmt(Math.round(pago)) +
+                          ", and screening is shared out in proportion to what each" +
+                          " address paid, as it happens." : "."));
               }
               if (validando) partes.push(
                 "This is the quality gate, not the funded search. No batch is " +
@@ -1030,14 +1044,11 @@ fetch("data/dados.json").then(r => r.json()).then(d => {
       document.getElementById("rodapeX").innerHTML =
         `Updates: <a href="${esc(tk.x)}" target="_blank" rel="noopener" style="color:var(--accent)">${esc(tk.x_handle || tk.x)}</a>`;
     }
-    if (!tk || !tk.contrato) return;         // sem contrato, sem barra
+    if (!tk || !tk.mint) return;             // antes do lancamento, sem barra
     const b = document.getElementById("barraCA");
-    const partes = [`<b>${esc(tk.ticker || "token")}</b>`,
-      `<a href="${esc(tk.explorer + tk.contrato)}" target="_blank" rel="noopener">${esc(tk.contrato)}</a>`];
-    if (tk.pons && tk.contrato)
-      partes.push(`<a href="${esc(tk.pons + tk.contrato)}" target="_blank" rel="noopener">pons</a>`);
-    if (tk.carteira_fees)
-      partes.push(`<b>fees wallet</b><a href="${esc("https://robinhoodchain.blockscout.com/address/" + tk.carteira_fees)}" target="_blank" rel="noopener">${esc(tk.carteira_fees)}</a>`);
+    const partes = [`<b>${esc(tk.ticker || "token")}</b>`, `<a href="${esc((tk.explorer || "https://solscan.io/token/") + tk.mint)}" target="_blank" rel="noopener">${esc(tk.mint)}</a>`];
+    if (tk.pump)
+      partes.push(`<a href="${esc(tk.pump + tk.mint)}" target="_blank" rel="noopener">pump.fun</a>`);
     b.innerHTML = partes.join("");
     b.hidden = false;
   }).catch(() => {});
